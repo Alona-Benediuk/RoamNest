@@ -16,8 +16,15 @@ Including another URLconf
 """
 from django.urls import path, include
 from django.contrib import admin
+from rest_framework_simplejwt.views import TokenRefreshView
 from properties.views import AmenityListAPIView, OwnerPropertyListAPIView
-from accounts.views import ProfileAPIView
+from accounts.views import (
+    ProfileAPIView,
+    RegisterAPIView,
+    LoginAPIView,
+    MeAPIView,
+    LogoutAPIView,
+)
 from accounts.admin_views import AdminUserListAPIView, AdminUserUpdateAPIView
 from properties.admin_views import AdminPropertyListAPIView, AdminPropertyUpdateAPIView
 from bookings.views import OwnerBookingListAPIView, OwnerBookingUpdateAPIView
@@ -29,6 +36,11 @@ urlpatterns = [
     path("api/bookings/", include("bookings.urls")),
     path("api/amenities/", AmenityListAPIView.as_view(), name="amenity-list"),
     path("api/profile/", ProfileAPIView.as_view(), name="profile"),
+    path("api/auth/register/", RegisterAPIView.as_view(), name="register"),
+    path("api/auth/login/", LoginAPIView.as_view(), name="login"),
+    path("api/auth/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
+    path("api/auth/me/", MeAPIView.as_view(), name="me"),
+    path("api/auth/logout/", LogoutAPIView.as_view(), name="logout"),
     path("api/admin/users/", AdminUserListAPIView.as_view(), name="admin-user-list"),
     path("api/admin/users/<int:pk>/", AdminUserUpdateAPIView.as_view(), name="admin-user-update"),
     path("api/admin/properties/", AdminPropertyListAPIView.as_view(), name="admin-property-list"),
