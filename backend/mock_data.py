@@ -58,7 +58,7 @@ MOCK_AMENITIES = [
 MOCK_PROPERTIES = [
     {
         "id": 1,
-        "owner": 2,
+        "owner": 3,
         "title": "Cozy Apartment in Kyiv",
         "description": "Modern apartment near the city center.",
         "property_type": "APARTMENT",
@@ -261,4 +261,26 @@ MOCK_BOOKINGS = [
         "created_at": "2026-10-12T12:00:00Z",
         "updated_at": "2026-10-12T12:00:00Z",
     },
+    
+    {
+        "id": 3,
+        "user": 2,
+        "room": 1,
+        "property_id": 1,
+        "property_title": "Cozy Apartment in Kyiv",
+        "room_title": "One-bedroom apartment",
+        "check_in": "2027-06-10",
+        "check_out": "2027-06-13",
+        "guests": 2,
+        "contact_name": "Test Guest",
+        "contact_phone": "+380501234567",
+        "contact_email": "test_guest@example.com",
+        "special_requests": "",
+        "price_per_night": "1800.00",
+        "total_price": "5400.00",
+        "status": "PENDING",
+        "created_at": None,
+        "updated_at": None,
+    },
+
 ]

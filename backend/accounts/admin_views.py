@@ -1,13 +1,25 @@
 
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import IsAuthenticated
+from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from mock_data import MOCK_USERS
 
 
+class IsAdminUser(IsAuthenticated):
+    def has_permission(self, request, view):
+        if not super().has_permission(request, view):
+            return False
+
+        return (
+            hasattr(request.user, "profile")
+            and request.user.profile.role == "ADMIN"
+        )
+
+
 class AdminUserListAPIView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAdminUser]
 
     def get(self, request):
         return Response(MOCK_USERS)
@@ -15,7 +27,7 @@ class AdminUserListAPIView(APIView):
 
 
 class AdminUserUpdateAPIView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAdminUser]
 
     def patch(self, request, pk):
         user = next(

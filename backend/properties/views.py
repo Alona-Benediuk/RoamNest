@@ -3,6 +3,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 
 from mock_data import MOCK_PROPERTIES, MOCK_AMENITIES
 
@@ -174,7 +175,26 @@ class PropertyListAPIView(APIView):
         return Response(properties)
 
         
+    
     def post(self, request):
+        if not request.user.is_authenticated:
+            return Response(
+                {"detail": "Authentication credentials were not provided."},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
+
+        if not hasattr(request.user, "profile"):
+            return Response(
+                {"detail": "User profile not found."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        if request.user.profile.role != "OWNER":
+            return Response(
+                {"detail": "Only owners can create properties."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
         required_fields = [
             "title",
             "description",
@@ -185,8 +205,7 @@ class PropertyListAPIView(APIView):
         ]
 
         missing_fields = [
-            field
-            for field in required_fields
+            field for field in required_fields
             if not request.data.get(field)
         ]
 
@@ -199,20 +218,12 @@ class PropertyListAPIView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        try:
-            owner_id = int(request.data.get("owner", 2))
-        except (TypeError, ValueError):
-            return Response(
-                {"detail": "Owner ID must be an integer."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
         property_data = {
             "id": max(
                 (item["id"] for item in MOCK_PROPERTIES),
                 default=0,
             ) + 1,
-            "owner": owner_id,
+            "owner": request.user.id,
             "title": request.data["title"],
             "description": request.data["description"],
             "property_type": request.data["property_type"],
@@ -272,12 +283,36 @@ class PropertyDetailAPIView(APIView):
             ),
             None,
         )
-
         if property_data is None:
             return Response(
                 {"detail": "Property not found."},
                 status=status.HTTP_404_NOT_FOUND,
             )
+                
+        if not request.user.is_authenticated:
+            return Response(
+                {"detail": "Authentication credentials were not provided."},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
+
+        if not hasattr(request.user, "profile"):
+            return Response(
+                {"detail": "User profile not found."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        if request.user.profile.role != "OWNER":
+            return Response(
+                {"detail": "Only owners can update properties."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        if str(property_data["owner"]) != str(request.user.id):
+            return Response(
+                {"detail": "You can only update your own properties."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
 
         editable_fields = [
             "title",
@@ -325,6 +360,31 @@ class PropertyDetailAPIView(APIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
+        
+        if not request.user.is_authenticated:
+            return Response(
+                {"detail": "Authentication credentials were not provided."},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
+
+        if not hasattr(request.user, "profile"):
+            return Response(
+                {"detail": "User profile not found."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        if request.user.profile.role != "OWNER":
+            return Response(
+                {"detail": "Only owners can delete properties."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        if str(property_data["owner"]) != str(request.user.id):
+            return Response(
+                {"detail": "You can only delete your own properties."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
         property_data["status"] = "INACTIVE"
 
         return Response(
@@ -345,10 +405,22 @@ class AmenityListAPIView(APIView):
 
 
 class OwnerPropertyListAPIView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        owner_id = request.query_params.get("owner_id", "2")
+        if not hasattr(request.user, "profile"):
+            return Response(
+                {"detail": "User profile not found."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        if request.user.profile.role != "OWNER":
+            return Response(
+                {"detail": "Only owners can access this resource."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        owner_id = str(request.user.id)
 
         properties = [
             property_data
@@ -358,11 +430,19 @@ class OwnerPropertyListAPIView(APIView):
 
         return Response(properties)
 
-
-class OwnerPropertyCreateAPIView(APIView):
-    permission_classes = [AllowAny]
-
     def post(self, request):
+        if not hasattr(request.user, "profile"):
+            return Response(
+                {"detail": "User profile not found."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        if request.user.profile.role != "OWNER":
+            return Response(
+                {"detail": "Only owners can create properties."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
         required_fields = [
             "title",
             "description",
@@ -373,8 +453,7 @@ class OwnerPropertyCreateAPIView(APIView):
         ]
 
         missing_fields = [
-            field
-            for field in required_fields
+            field for field in required_fields
             if not request.data.get(field)
         ]
 
@@ -387,22 +466,12 @@ class OwnerPropertyCreateAPIView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        owner_id = request.data.get("owner", 2)
-
-        try:
-            owner_id = int(owner_id)
-        except (TypeError, ValueError):
-            return Response(
-                {"detail": "Owner ID must be an integer."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
         property_data = {
             "id": max(
                 (item["id"] for item in MOCK_PROPERTIES),
                 default=0,
             ) + 1,
-            "owner": owner_id,
+            "owner": request.user.id,
             "title": request.data["title"],
             "description": request.data["description"],
             "property_type": request.data["property_type"],
@@ -439,6 +508,31 @@ class PropertyImageListCreateAPIView(APIView):
             return Response(
                 {"detail": "Property not found."},
                 status=status.HTTP_404_NOT_FOUND,
+            )
+
+        
+        if not request.user.is_authenticated:
+            return Response(
+                {"detail": "Authentication credentials were not provided."},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
+
+        if not hasattr(request.user, "profile"):
+            return Response(
+                {"detail": "User profile not found."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        if request.user.profile.role != "OWNER":
+            return Response(
+                {"detail": "Only owners can manage property images."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        if str(property_data["owner"]) != str(request.user.id):
+            return Response(
+                {"detail": "You can only manage images of your own properties."},
+                status=status.HTTP_403_FORBIDDEN,
             )
 
         image_url = request.data.get("image_url")
@@ -499,6 +593,30 @@ class PropertyImageDeleteAPIView(APIView):
             return Response(
                 {"detail": "Property not found."},
                 status=status.HTTP_404_NOT_FOUND,
+            )
+                    
+        if not request.user.is_authenticated:
+            return Response(
+                {"detail": "Authentication credentials were not provided."},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
+
+        if not hasattr(request.user, "profile"):
+            return Response(
+                {"detail": "User profile not found."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        if request.user.profile.role != "OWNER":
+            return Response(
+                {"detail": "Only owners can manage property images."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        if str(property_data["owner"]) != str(request.user.id):
+            return Response(
+                {"detail": "You can only manage images of your own properties."},
+                status=status.HTTP_403_FORBIDDEN,
             )
 
         images = property_data.get("images", [])
