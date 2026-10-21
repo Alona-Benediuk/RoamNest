@@ -1,5 +1,6 @@
 
 from rest_framework.permissions import AllowAny
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
@@ -10,10 +11,10 @@ from mock_data import MOCK_BOOKINGS, MOCK_PROPERTIES, MOCK_USERS
 
 
 class BookingListAPIView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        user_id = request.query_params.get("user_id", "1")
+        user_id = str(request.user.id)
 
         bookings = [
             booking
@@ -22,6 +23,7 @@ class BookingListAPIView(APIView):
         ]
 
         return Response(bookings)
+
 
     def post(self, request):
         required_fields = [
@@ -108,7 +110,7 @@ class BookingListAPIView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        user_id = request.data.get("user", 1)
+        user_id = request.user.id
 
         try:
             user_id = int(user_id)
@@ -118,15 +120,10 @@ class BookingListAPIView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        user = next(
-            (item for item in MOCK_USERS if item["id"] == user_id),
-            None,
-        )
-
-        if user is None or user["role"] != "USER":
+        if request.user.profile.role != "USER":
             return Response(
-                {"detail": "Guest user not found."},
-                status=status.HTTP_400_BAD_REQUEST,
+                {"detail": "Only guests can create bookings."},
+                status=status.HTTP_403_FORBIDDEN,
             )
 
         
@@ -185,9 +182,8 @@ class BookingListAPIView(APIView):
         )
 
 
-
 class BookingDetailAPIView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, pk):
         booking = next(
@@ -202,15 +198,20 @@ class BookingDetailAPIView(APIView):
         if booking is None:
             return Response(
                 {"detail": "Booking not found."},
-                status=404,
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        if str(booking["user"]) != str(request.user.id):
+            return Response(
+                {"detail": "You can only view your own bookings."},
+                status=status.HTTP_403_FORBIDDEN,
             )
 
         return Response(booking)
 
 
-
 class BookingCancelAPIView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def post(self, request, pk):
         booking = next(
@@ -224,26 +225,44 @@ class BookingCancelAPIView(APIView):
         if booking is None:
             return Response(
                 {"detail": "Booking not found."},
-                status=404,
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        if str(booking["user"]) != str(request.user.id):
+            return Response(
+                {"detail": "You can only cancel your own bookings."},
+                status=status.HTTP_403_FORBIDDEN,
             )
 
         if booking["status"] == "CANCELLED":
             return Response(
                 {"detail": "Booking is already cancelled."},
-                status=400,
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         booking["status"] = "CANCELLED"
 
-        return Response(booking, status=200)
-
+        return Response(booking, status=status.HTTP_200_OK)
 
 
 class OwnerBookingListAPIView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
+
 
     def get(self, request):
-        owner_id = request.query_params.get("owner_id", "2")
+        if not hasattr(request.user, "profile"):
+            return Response(
+                {"detail": "User profile not found."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        if request.user.profile.role != "OWNER":
+            return Response(
+                {"detail": "Only owners can access this resource."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        owner_id = str(request.user.id)
 
         owner_properties = {
             str(property_data["id"])
@@ -260,9 +279,8 @@ class OwnerBookingListAPIView(APIView):
         return Response(bookings)
 
 
-
 class OwnerBookingUpdateAPIView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def patch(self, request, pk):
         booking = next(
@@ -277,6 +295,40 @@ class OwnerBookingUpdateAPIView(APIView):
             return Response(
                 {"detail": "Booking not found."},
                 status=status.HTTP_404_NOT_FOUND,
+            )
+
+            
+        if not hasattr(request.user, "profile"):
+            return Response(
+                {"detail": "User profile not found."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        if request.user.profile.role != "OWNER":
+            return Response(
+                {"detail": "Only owners can update bookings."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        property_data = next(
+            (
+                item
+                for item in MOCK_PROPERTIES
+                if item["id"] == booking["property_id"]
+            ),
+            None,
+        )
+
+        if property_data is None:
+            return Response(
+                {"detail": "Property not found."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        if str(property_data["owner"]) != str(request.user.id):
+            return Response(
+                {"detail": "You can only update bookings for your own properties."},
+                status=status.HTTP_403_FORBIDDEN,
             )
 
         new_status = request.data.get("status")

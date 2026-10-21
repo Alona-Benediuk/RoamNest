@@ -1,5 +1,5 @@
 
-from rest_framework.permissions import AllowAny
+from accounts.admin_views import IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -7,14 +7,14 @@ from mock_data import MOCK_PROPERTIES
 
 
 class AdminPropertyListAPIView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAdminUser]
 
     def get(self, request):
         return Response(MOCK_PROPERTIES)
 
 
 class AdminPropertyUpdateAPIView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAdminUser]
 
     def patch(self, request, pk):
         property_item = next(

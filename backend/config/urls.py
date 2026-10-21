@@ -17,7 +17,10 @@ Including another URLconf
 from django.urls import path, include
 from django.contrib import admin
 from rest_framework_simplejwt.views import TokenRefreshView
-from properties.views import AmenityListAPIView, OwnerPropertyListAPIView
+from properties.views import (
+    AmenityListAPIView,
+    OwnerPropertyListAPIView,
+)
 from accounts.views import (
     ProfileAPIView,
     RegisterAPIView,
