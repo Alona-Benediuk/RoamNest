@@ -6,6 +6,7 @@ RoamNest is a hotel booking web application developed as a diploma project.
 - Backend Developer — Alena Benedyuk
 - Frontend Developer — Dmytro Yevheniev
 - UI Developer — Polina Yeremii
+- DevOps - Bogdan Kotenko
 
 ## Technologies
 
