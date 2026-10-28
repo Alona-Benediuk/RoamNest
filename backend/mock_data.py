@@ -71,7 +71,7 @@ MOCK_PROPERTIES = [
             {"id": 4, "name": "Kitchen"},
             {"id": 5, "name": "Air conditioning"},
         ],
-        "rooms": [
+        "rental_units": [
             {
                 "id": 1,
                 "title": "One-bedroom apartment",
@@ -95,7 +95,7 @@ MOCK_PROPERTIES = [
                 "id": 1,
                 "image_url": "https://placehold.co/1200x800?text=Kyiv+Apartment",
                 "is_main": True,
-                "room": None,
+                "rental_unit": None,
             }
         ],
     },
@@ -114,7 +114,7 @@ MOCK_PROPERTIES = [
             {"id": 2, "name": "Parking"},
             {"id": 7, "name": "Pet friendly"},
         ],
-        "rooms": [
+        "rental_units": [
             {
                 "id": 2,
                 "title": "Entire house",
@@ -138,7 +138,7 @@ MOCK_PROPERTIES = [
                 "id": 2,
                 "image_url": "https://placehold.co/1200x800?text=Mountain+House",
                 "is_main": True,
-                "room": None,
+                "rental_unit": None,
             }
         ],
     },
@@ -157,7 +157,7 @@ MOCK_PROPERTIES = [
             {"id": 2, "name": "Parking"},
             {"id": 6, "name": "Breakfast"},
         ],
-        "rooms": [
+        "rental_units": [
             {
                 "id": 3,
                 "title": "Standard double room",
@@ -181,7 +181,7 @@ MOCK_PROPERTIES = [
                 "id": 3,
                 "image_url": "https://placehold.co/1200x800?text=Hotel+Room",
                 "is_main": True,
-                "room": None,
+                "rental_unit": None,
             }
         ],
     },
@@ -198,7 +198,7 @@ MOCK_PROPERTIES = [
         "amenities": [
             {"id": 1, "name": "Wi-Fi"},
         ],
-        "rooms": [
+        "rental_units": [
             {
                 "id": 4,
                 "title": "Private room",
@@ -224,10 +224,10 @@ MOCK_BOOKINGS = [
     {
         "id": 1,
         "user": 1,
-        "room": 1,
+        "rental_unit": 1,
         "property_id": 1,
         "property_title": "Cozy Apartment in Kyiv",
-        "room_title": "One-bedroom apartment",
+        "rental_unit_title": "One-bedroom apartment",
         "check_in": "2026-11-10",
         "check_out": "2026-11-13",
         "guests": 2,
@@ -244,10 +244,10 @@ MOCK_BOOKINGS = [
     {
         "id": 2,
         "user": 1,
-        "room": 3,
+        "rental_unit": 3,
         "property_id": 3,
         "property_title": "Hotel Standard Room",
-        "room_title": "Standard double room",
+        "rental_unit_title": "Standard double room",
         "check_in": "2026-12-01",
         "check_out": "2026-12-03",
         "guests": 2,
@@ -265,10 +265,10 @@ MOCK_BOOKINGS = [
     {
         "id": 3,
         "user": 2,
-        "room": 1,
+        "rental_unit": 1,
         "property_id": 1,
         "property_title": "Cozy Apartment in Kyiv",
-        "room_title": "One-bedroom apartment",
+        "rental_unit_title": "One-bedroom apartment",
         "check_in": "2027-06-10",
         "check_out": "2027-06-13",
         "guests": 2,

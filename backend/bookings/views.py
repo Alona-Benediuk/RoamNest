@@ -10,6 +10,7 @@ from datetime import date
 from mock_data import MOCK_BOOKINGS, MOCK_PROPERTIES, MOCK_USERS
 
 
+
 class BookingListAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -24,10 +25,9 @@ class BookingListAPIView(APIView):
 
         return Response(bookings)
 
-
     def post(self, request):
         required_fields = [
-            "room",
+            "rental_unit",
             "check_in",
             "check_out",
             "guests",
@@ -53,13 +53,23 @@ class BookingListAPIView(APIView):
             )
 
         try:
-            room_id = int(request.data["room"])
+            rental_unit_id = int(request.data["rental_unit"])
             guests = int(request.data["guests"])
             check_in = date.fromisoformat(request.data["check_in"])
             check_out = date.fromisoformat(request.data["check_out"])
         except (ValueError, TypeError):
             return Response(
-                {"detail": "Invalid room, guests, or date format."},
+                {
+                    "detail": (
+                        "Invalid rental unit, guests, or date format."
+                    )
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if rental_unit_id < 1:
+            return Response(
+                {"detail": "Invalid rental unit ID."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
@@ -81,43 +91,10 @@ class BookingListAPIView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        property_data = next(
-            (
-                item for item in MOCK_PROPERTIES
-                if item["status"] == "PUBLISHED"
-                and any(
-                    room["id"] == room_id and room["is_published"]
-                    for room in item["rooms"]
-                )
-            ),
-            None,
-        )
-
-        if property_data is None:
+        if not hasattr(request.user, "profile"):
             return Response(
-                {"detail": "Published room not found."},
-                status=status.HTTP_404_NOT_FOUND,
-            )
-
-        room_data = next(
-            room for room in property_data["rooms"]
-            if room["id"] == room_id and room["is_published"]
-        )
-
-        if guests > room_data["max_guests"]:
-            return Response(
-                {"detail": "Too many guests for this room."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        user_id = request.user.id
-
-        try:
-            user_id = int(user_id)
-        except (ValueError, TypeError):
-            return Response(
-                {"detail": "User ID must be an integer."},
-                status=status.HTTP_400_BAD_REQUEST,
+                {"detail": "User profile not found."},
+                status=status.HTTP_403_FORBIDDEN,
             )
 
         if request.user.profile.role != "USER":
@@ -126,48 +103,89 @@ class BookingListAPIView(APIView):
                 status=status.HTTP_403_FORBIDDEN,
             )
 
-        
+        # Знаходимо опубліковане помешкання
+        # з опублікованою одиницею житла.
+        property_data = next(
+            (
+                item
+                for item in MOCK_PROPERTIES
+                if item["status"] == "PUBLISHED"
+                and any(
+                    rental_unit["id"] == rental_unit_id
+                    and rental_unit["is_published"]
+                    for rental_unit in item["rental_units"]
+                )
+            ),
+            None,
+        )
+
+        if property_data is None:
+            return Response(
+                {"detail": "Published rental unit not found."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        rental_unit_data = next(
+            rental_unit
+            for rental_unit in property_data["rental_units"]
+            if rental_unit["id"] == rental_unit_id
+            and rental_unit["is_published"]
+        )
+
+        if guests > rental_unit_data["max_guests"]:
+            return Response(
+                {
+                    "detail": (
+                        "Too many guests for this rental unit."
+                    )
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # Перевіряємо перетин дат з іншими бронюваннями.
         overlapping_bookings = [
             booking
             for booking in MOCK_BOOKINGS
             if (
-                booking["room"] == room_id
+                booking["rental_unit"] == rental_unit_id
                 and booking["status"] in ("PENDING", "CONFIRMED")
                 and check_in.isoformat() < booking["check_out"]
                 and check_out.isoformat() > booking["check_in"]
             )
         ]
 
-        rooms_count = room_data.get("rooms_count", 1)
+        # Кількість одночасно доступних одиниць житла.
+        rooms_count = rental_unit_data.get("rooms_count", 1)
 
         if len(overlapping_bookings) >= rooms_count:
             return Response(
-                {"detail": "No rooms available for these dates."},
+                {"detail": "No rental units available for these dates."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-
         nights = (check_out - check_in).days
-        price = float(room_data["price_per_night"])
+        price = float(rental_unit_data["price_per_night"])
 
         new_booking = {
             "id": max(
                 (item["id"] for item in MOCK_BOOKINGS),
                 default=0,
             ) + 1,
-            "user": user_id,
-            "room": room_id,
+            "user": request.user.id,
+            "rental_unit": rental_unit_id,
             "property_id": property_data["id"],
             "property_title": property_data["title"],
-            "room_title": room_data["title"],
+            "rental_unit_title": rental_unit_data["title"],
             "check_in": check_in.isoformat(),
             "check_out": check_out.isoformat(),
             "guests": guests,
             "contact_name": request.data["contact_name"],
             "contact_phone": request.data["contact_phone"],
             "contact_email": request.data["contact_email"],
-            "special_requests": request.data.get("special_requests", ""),
-            "price_per_night": room_data["price_per_night"],
+            "special_requests": request.data.get(
+                "special_requests", ""
+            ),
+            "price_per_night": rental_unit_data["price_per_night"],
             "total_price": f"{price * nights:.2f}",
             "status": "PENDING",
             "created_at": None,

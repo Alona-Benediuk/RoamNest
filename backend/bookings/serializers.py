@@ -1,20 +1,17 @@
 
 from rest_framework import serializers
-
-from datetime import date
 from django.utils import timezone
-
 
 from .models import Booking
 
 
 class BookingSerializer(serializers.ModelSerializer):
     property_title = serializers.CharField(
-        source="room.property.title",
+        source="rental_unit.property.title",
         read_only=True,
     )
-    room_title = serializers.CharField(
-        source="room.title",
+    rental_unit_title = serializers.CharField(
+        source="rental_unit.title",
         read_only=True,
     )
 
@@ -23,9 +20,9 @@ class BookingSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "user",
-            "room",
+            "rental_unit",
             "property_title",
-            "room_title",
+            "rental_unit_title",
             "check_in",
             "check_out",
             "guests",
@@ -43,19 +40,19 @@ class BookingSerializer(serializers.ModelSerializer):
             "id",
             "user",
             "property_title",
-            "room_title",
+            "rental_unit_title",
             "price_per_night",
             "total_price",
             "status",
             "created_at",
             "updated_at",
         ]
-    
+
     def validate(self, attrs):
         check_in = attrs.get("check_in")
         check_out = attrs.get("check_out")
         guests = attrs.get("guests")
-        room = attrs.get("room")
+        rental_unit = attrs.get("rental_unit")
 
         if check_in and check_in < timezone.localdate():
             raise serializers.ValidationError({
@@ -67,25 +64,28 @@ class BookingSerializer(serializers.ModelSerializer):
                 "check_out": "Check-out must be after check-in."
             })
 
-        if room and guests and guests > room.max_guests:
+        if (
+            rental_unit
+            and guests is not None
+            and guests > rental_unit.max_guests
+        ):
             raise serializers.ValidationError({
-                "guests": "Guest count exceeds room capacity."
+                "guests": "Guest count exceeds rental unit capacity."
             })
 
-        if room and not room.is_published:
+        if rental_unit and not rental_unit.is_published:
             raise serializers.ValidationError({
-                "room": "This room is not available for booking."
+                "rental_unit": "This rental unit is not available for booking."
             })
 
-        if room and room.property.status != "PUBLISHED":
+        if rental_unit and rental_unit.property.status != "PUBLISHED":
             raise serializers.ValidationError({
-                "room": "This property is not published."
+                "rental_unit": "This property is not published."
             })
 
-        
-        if room and check_in and check_out:
+        if rental_unit and check_in and check_out:
             overlapping_bookings = Booking.objects.filter(
-                room=room,
+                rental_unit=rental_unit,
                 check_in__lt=check_out,
                 check_out__gt=check_in,
                 status__in=[
@@ -94,9 +94,17 @@ class BookingSerializer(serializers.ModelSerializer):
                 ],
             )
 
+            # Під час оновлення не враховуємо поточне бронювання.
+            if self.instance:
+                overlapping_bookings = overlapping_bookings.exclude(
+                    pk=self.instance.pk
+                )
+
             if overlapping_bookings.exists():
                 raise serializers.ValidationError({
-                    "check_in": "This room is already booked for these dates."
+                    "check_in": (
+                        "This rental unit is already booked for these dates."
+                    )
                 })
 
         return attrs

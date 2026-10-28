@@ -1,7 +1,6 @@
 
 from django.conf import settings
 from django.db import models
-from properties.models import Room
 
 
 class Booking(models.Model):
@@ -20,8 +19,8 @@ class Booking(models.Model):
         related_name="bookings",
     )
 
-    room = models.ForeignKey(
-        Room,
+    rental_unit = models.ForeignKey(
+        "properties.RentalUnit",
         on_delete=models.CASCADE,
         related_name="bookings",
     )
