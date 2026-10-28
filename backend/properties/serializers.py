@@ -1,6 +1,7 @@
 
 from rest_framework import serializers
-from .models import Property, Room, Amenity, PropertyImage
+
+from .models import Property, RentalUnit, Amenity, PropertyImage
 
 
 class AmenitySerializer(serializers.ModelSerializer):
@@ -9,11 +10,11 @@ class AmenitySerializer(serializers.ModelSerializer):
         fields = ["id", "name"]
 
 
-class RoomSerializer(serializers.ModelSerializer):
+class RentalUnitSerializer(serializers.ModelSerializer):
     amenities = AmenitySerializer(many=True, read_only=True)
 
     class Meta:
-        model = Room
+        model = RentalUnit
         fields = [
             "id",
             "title",
@@ -26,17 +27,18 @@ class RoomSerializer(serializers.ModelSerializer):
             "bathrooms",
             "rooms_count",
             "amenities",
+            "is_published",
         ]
 
 
 class PropertyImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = PropertyImage
-        fields = ["id", "image_url", "is_main", "room"]
+        fields = ["id", "image_url", "is_main", "rental_unit"]
 
 
 class PropertyListSerializer(serializers.ModelSerializer):
-    rooms = RoomSerializer(many=True, read_only=True)
+    rental_units = RentalUnitSerializer(many=True, read_only=True)
     amenities = AmenitySerializer(many=True, read_only=True)
     images = PropertyImageSerializer(many=True, read_only=True)
 
@@ -52,6 +54,6 @@ class PropertyListSerializer(serializers.ModelSerializer):
             "country",
             "status",
             "amenities",
-            "rooms",
+            "rental_units",
             "images",
         ]

@@ -57,11 +57,11 @@ class Amenity(models.Model):
         return self.name
 
 
-class Room(models.Model):
+class RentalUnit(models.Model):
     property = models.ForeignKey(
         Property,
         on_delete=models.CASCADE,
-        related_name="rooms",
+        related_name="rental_units",
     )
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True)
@@ -78,7 +78,7 @@ class Room(models.Model):
     amenities = models.ManyToManyField(
         Amenity,
         blank=True,
-        related_name="rooms",
+        related_name="rental_units",
     )
     is_published = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -94,8 +94,8 @@ class PropertyImage(models.Model):
         on_delete=models.CASCADE,
         related_name="images",
     )
-    room = models.ForeignKey(
-        Room,
+    rental_unit = models.ForeignKey(
+        RentalUnit,
         on_delete=models.CASCADE,
         related_name="images",
         null=True,
