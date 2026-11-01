@@ -11,3 +11,8 @@ from .image_views import (
     PropertyImageListCreateAPIView,
     PropertyImageDeleteAPIView,
 )
+
+from .rental_unit_views import (
+    PropertyRentalUnitListCreateAPIView,
+    RentalUnitDetailAPIView,
+)

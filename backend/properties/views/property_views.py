@@ -1,5 +1,5 @@
-
-from decimal import Decimal
+п»ї
+from decimal import Decimal, InvalidOperation
 
 from django.db.models import Min, Q, Prefetch
 
@@ -8,11 +8,17 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from ..models import Property, RentalUnit
+from ..models import Amenity, Property, RentalUnit
 from ..serializers import PropertyListSerializer
 
 
 class PropertyCreateSerializer(serializers.ModelSerializer):
+    amenities = serializers.PrimaryKeyRelatedField(
+            many=True,
+            queryset=Amenity.objects.all(),
+            required=False,
+        )
+
     class Meta:
         model = Property
         fields = [
@@ -22,7 +28,71 @@ class PropertyCreateSerializer(serializers.ModelSerializer):
             "address",
             "city",
             "country",
+            "amenities",
         ]
+
+
+def _check_owner(request):
+    if not request.user.is_authenticated:
+        return Response(
+            {"detail": "Authentication credentials were not provided."},
+            status=status.HTTP_401_UNAUTHORIZED,
+        )
+
+    profile = getattr(request.user, "profile", None)
+
+    if profile is None:
+        return Response(
+            {"detail": "User profile not found."},
+            status=status.HTTP_403_FORBIDDEN,
+        )
+
+    if profile.role != "OWNER":
+        return Response(
+            {"detail": "Only owners can access this resource."},
+            status=status.HTTP_403_FORBIDDEN,
+        )
+
+    return None
+
+
+def _create_property(request):
+    required_fields = [
+        "title",
+        "description",
+        "property_type",
+        "address",
+        "city",
+        "country",
+    ]
+    missing_fields = [
+        field for field in required_fields if not request.data.get(field)
+    ]
+
+    if missing_fields:
+        return Response(
+            {
+                "detail": "Required fields are missing.",
+                "fields": missing_fields,
+            },
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    serializer = PropertyCreateSerializer(data=request.data)
+    if not serializer.is_valid():
+        return Response(
+            serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    property_obj = serializer.save(
+        owner=request.user,
+        status=Property.Status.NEW,
+    )
+    return Response(
+        PropertyListSerializer(property_obj).data,
+        status=status.HTTP_201_CREATED,
+    )
 
 
 class PropertyListAPIView(APIView):
@@ -39,7 +109,7 @@ class PropertyListAPIView(APIView):
         amenities = request.query_params.getlist("amenities")
         ordering = request.query_params.get("ordering")
 
-        # Перевіряємо числові параметри.
+        # РџРµСЂРµРІС–СЂСЏС”РјРѕ С‡РёСЃР»РѕРІС– РїР°СЂР°РјРµС‚СЂРё.
         try:
             guests_count = int(guests) if guests is not None else None
             max_guests_count = (
@@ -56,19 +126,19 @@ class PropertyListAPIView(APIView):
             ):
                 raise ValueError
 
-            if (
-                minimum is not None
-                and maximum is not None
-                and minimum > maximum
-            ):
-                return Response(
-                    {"detail": "min_price cannot exceed max_price."},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
-
-        except (ValueError, TypeError):
+        except (ValueError, TypeError, InvalidOperation):
             return Response(
                 {"detail": "Invalid numeric filter parameter."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if (
+            minimum is not None
+            and maximum is not None
+            and minimum > maximum
+        ):
+            return Response(
+                {"detail": "min_price cannot exceed max_price."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
@@ -78,7 +148,7 @@ class PropertyListAPIView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        # Базовий запит до опублікованих одиниць оренди.
+        # Р‘Р°Р·РѕРІРёР№ Р·Р°РїРёС‚ РґРѕ РѕРїСѓР±Р»С–РєРѕРІР°РЅРёС… РѕРґРёРЅРёС†СЊ РѕСЂРµРЅРґРё.
         rental_unit_query = RentalUnit.objects.filter(is_published=True)
 
         if guests_count is not None:
@@ -116,8 +186,8 @@ class PropertyListAPIView(APIView):
                 property_type__iexact=property_type
             )
 
-        # Усі цінові фільтри та фільтри місткості
-        # мають відповідати одній одиниці оренди.
+        # РЈСЃС– С†С–РЅРѕРІС– С„С–Р»СЊС‚СЂРё С‚Р° С„С–Р»СЊС‚СЂРё РјС–СЃС‚РєРѕСЃС‚С–
+        # РјР°СЋС‚СЊ РІС–РґРїРѕРІС–РґР°С‚Рё РѕРґРЅС–Р№ РѕРґРёРЅРёС†С– РѕСЂРµРЅРґРё.
         rental_unit_filters_used = any(
             value is not None
             for value in (
@@ -133,7 +203,7 @@ class PropertyListAPIView(APIView):
                 rental_units__in=rental_unit_query
             )
 
-        # Фільтр за всіма вказаними зручностями житла.
+        # Р¤С–Р»СЊС‚СЂ Р·Р° РІСЃС–РјР° РІРєР°Р·Р°РЅРёРјРё Р·СЂСѓС‡РЅРѕСЃС‚СЏРјРё Р¶РёС‚Р»Р°.
         if amenities:
             try:
                 amenity_ids = {int(value) for value in amenities}
@@ -148,7 +218,7 @@ class PropertyListAPIView(APIView):
                     amenities__id=amenity_id
                 )
 
-        # Сортування за мінімальною ціною одиниці оренди.
+        # РЎРѕСЂС‚СѓРІР°РЅРЅСЏ Р·Р° РјС–РЅС–РјР°Р»СЊРЅРѕСЋ С†С–РЅРѕСЋ РѕРґРёРЅРёС†С– РѕСЂРµРЅРґРё.
         if ordering in ("price", "-price"):
             properties = properties.annotate(
                 min_rental_unit_price=Min(
@@ -163,8 +233,11 @@ class PropertyListAPIView(APIView):
                 else "-min_rental_unit_price"
             )
 
-        # У відповіді повертаємо опубліковані одиниці оренди.
-        rental_unit_query = rental_unit_query.order_by("id")
+        # РЈ РІС–РґРїРѕРІС–РґС– РїРѕРІРµСЂС‚Р°С”РјРѕ РѕРїСѓР±Р»С–РєРѕРІР°РЅС– РѕРґРёРЅРёС†С– РѕСЂРµРЅРґРё.
+        rental_unit_query = rental_unit_query.order_by("id").prefetch_related(
+            "amenities",
+            "images",
+        )
 
         properties = properties.prefetch_related(
             Prefetch(
@@ -179,74 +252,26 @@ class PropertyListAPIView(APIView):
         return Response(serializer.data)
 
     def post(self, request):
-        if not request.user.is_authenticated:
-            return Response(
-                {"detail": "Authentication credentials were not provided."},
-                status=status.HTTP_401_UNAUTHORIZED,
-            )
-
-        if not hasattr(request.user, "profile"):
-            return Response(
-                {"detail": "User profile not found."},
-                status=status.HTTP_403_FORBIDDEN,
-            )
-
-        if request.user.profile.role != "OWNER":
-            return Response(
-                {"detail": "Only owners can create properties."},
-                status=status.HTTP_403_FORBIDDEN,
-            )
-
-        required_fields = [
-            "title",
-            "description",
-            "property_type",
-            "address",
-            "city",
-            "country",
-        ]
-
-        missing_fields = [
-            field
-            for field in required_fields
-            if not request.data.get(field)
-        ]
-
-        if missing_fields:
-            return Response(
-                {
-                    "detail": "Required fields are missing.",
-                    "fields": missing_fields,
-                },
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        create_serializer = PropertyCreateSerializer(data=request.data)
-
-        if not create_serializer.is_valid():
-            return Response(
-                create_serializer.errors,
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        property_obj = create_serializer.save(
-            owner=request.user,
-            status=Property.Status.NEW,
-        )
-
-        return Response(
-            PropertyListSerializer(property_obj).data,
-            status=status.HTTP_201_CREATED,
-        )
+        error = _check_owner(request)
+        if error:
+            return error
+        return _create_property(request)
 
 
 class PropertyDetailAPIView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request, pk):
+        published_units = RentalUnit.objects.filter(
+            is_published=True
+        ).prefetch_related("amenities", "images")
+
         try:
             property_obj = Property.objects.prefetch_related(
-                "rental_units__amenities",
+                Prefetch(
+                    "rental_units",
+                    queryset=published_units,
+                ),
                 "amenities",
                 "images",
             ).get(
@@ -259,39 +284,13 @@ class PropertyDetailAPIView(APIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
-        data = PropertyListSerializer(property_obj).data
+        return Response(PropertyListSerializer(property_obj).data)
 
-        # Повертаємо лише опубліковані одиниці оренди.
-        data["rental_units"] = [
-            rental_unit
-            for rental_unit in data["rental_units"]
-            if RentalUnit.objects.filter(
-                pk=rental_unit["id"],
-                property_id=property_obj.id,
-                is_published=True,
-            ).exists()
-        ]
-
-        return Response(data)
 
     def patch(self, request, pk):
-        if not request.user.is_authenticated:
-            return Response(
-                {"detail": "Authentication credentials were not provided."},
-                status=status.HTTP_401_UNAUTHORIZED,
-            )
-
-        if not hasattr(request.user, "profile"):
-            return Response(
-                {"detail": "User profile not found."},
-                status=status.HTTP_403_FORBIDDEN,
-            )
-
-        if request.user.profile.role != "OWNER":
-            return Response(
-                {"detail": "Only owners can update properties."},
-                status=status.HTTP_403_FORBIDDEN,
-            )
+        error = _check_owner(request)
+        if error:
+            return error
 
         try:
             property_obj = Property.objects.get(pk=pk)
@@ -307,41 +306,19 @@ class PropertyDetailAPIView(APIView):
                 status=status.HTTP_403_FORBIDDEN,
             )
 
-        editable_fields = (
-            "title",
-            "description",
-            "property_type",
-            "address",
-            "city",
-            "country",
+        serializer = PropertyCreateSerializer(
+            property_obj,
+            data=request.data,
+            partial=True,
         )
 
-        for field in editable_fields:
-            if field in request.data:
-                value = request.data[field]
+        if not serializer.is_valid():
+            return Response(
+                serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
-                if not isinstance(value, str) or not value.strip():
-                    return Response(
-                        {
-                            "detail": (
-                                f"{field} must be a non-empty string."
-                            )
-                        },
-                        status=status.HTTP_400_BAD_REQUEST,
-                    )
-
-                if (
-                    field == "property_type"
-                    and value not in Property.PropertyType.values
-                ):
-                    return Response(
-                        {"detail": "Invalid property_type."},
-                        status=status.HTTP_400_BAD_REQUEST,
-                    )
-
-                setattr(property_obj, field, value.strip())
-
-        property_obj.save()
+        property_obj = serializer.save()
 
         return Response(
             PropertyListSerializer(property_obj).data,
@@ -349,23 +326,9 @@ class PropertyDetailAPIView(APIView):
         )
 
     def delete(self, request, pk):
-        if not request.user.is_authenticated:
-            return Response(
-                {"detail": "Authentication credentials were not provided."},
-                status=status.HTTP_401_UNAUTHORIZED,
-            )
-
-        if not hasattr(request.user, "profile"):
-            return Response(
-                {"detail": "User profile not found."},
-                status=status.HTTP_403_FORBIDDEN,
-            )
-
-        if request.user.profile.role != "OWNER":
-            return Response(
-                {"detail": "Only owners can delete properties."},
-                status=status.HTTP_403_FORBIDDEN,
-            )
+        error = _check_owner(request)
+        if error:
+            return error
 
         try:
             property_obj = Property.objects.get(pk=pk)
@@ -397,32 +360,17 @@ class PropertyDetailAPIView(APIView):
 class OwnerPropertyListAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def _check_owner(self, request):
-        if not hasattr(request.user, "profile"):
-            return Response(
-                {"detail": "User profile not found."},
-                status=status.HTTP_403_FORBIDDEN,
-            )
-
-        if request.user.profile.role != "OWNER":
-            return Response(
-                {"detail": "Only owners can access this resource."},
-                status=status.HTTP_403_FORBIDDEN,
-            )
-
-        return None
-
     def get(self, request):
-        error = self._check_owner(request)
+        error = _check_owner(request)
         if error:
             return error
 
         properties = (
-            Property.objects
-            .filter(owner=request.user)
+            Property.objects.filter(owner=request.user)
             .prefetch_related(
                 "amenities",
                 "rental_units__amenities",
+                "rental_units__images",
                 "images",
             )
             .order_by("-created_at")
@@ -432,48 +380,7 @@ class OwnerPropertyListAPIView(APIView):
         return Response(serializer.data)
 
     def post(self, request):
-        error = self._check_owner(request)
+        error = _check_owner(request)
         if error:
             return error
-
-        required_fields = [
-            "title",
-            "description",
-            "property_type",
-            "address",
-            "city",
-            "country",
-        ]
-
-        missing_fields = [
-            field
-            for field in required_fields
-            if not request.data.get(field)
-        ]
-
-        if missing_fields:
-            return Response(
-                {
-                    "detail": "Required fields are missing.",
-                    "fields": missing_fields,
-                },
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        serializer = PropertyCreateSerializer(data=request.data)
-
-        if not serializer.is_valid():
-            return Response(
-                serializer.errors,
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        property_obj = serializer.save(
-            owner=request.user,
-            status=Property.Status.NEW,
-        )
-
-        return Response(
-            PropertyListSerializer(property_obj).data,
-            status=status.HTTP_201_CREATED,
-        )
+        return _create_property(request)
