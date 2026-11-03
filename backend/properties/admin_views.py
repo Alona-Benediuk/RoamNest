@@ -1,43 +1,92 @@
+﻿from django.db import transaction
 
-from accounts.admin_views import IsAdminUser
+from rest_framework import status, serializers
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from mock_data import MOCK_PROPERTIES
+from accounts.admin_views import IsAdminUser
+
+from .models import Property
+from .serializers import (
+    AmenitySerializer,
+    RentalUnitSerializer,
+    PropertyImageSerializer,
+)
+
+
+class AdminPropertySerializer(serializers.ModelSerializer):
+    owner = serializers.PrimaryKeyRelatedField(read_only=True)
+    amenities = AmenitySerializer(many=True, read_only=True)
+    rental_units = RentalUnitSerializer(many=True, read_only=True)
+    images = PropertyImageSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Property
+        fields = [
+            "id",
+            "owner",
+            "title",
+            "description",
+            "property_type",
+            "address",
+            "city",
+            "country",
+            "status",
+            "amenities",
+            "rental_units",
+            "images",
+        ]
+
+
+def get_admin_property_queryset():
+    return (
+        Property.objects
+        .select_related("owner")
+        .prefetch_related(
+            "amenities",
+            "images",
+            "rental_units__amenities",
+            "rental_units__images",
+        )
+        .order_by("id")
+    )
 
 
 class AdminPropertyListAPIView(APIView):
     permission_classes = [IsAdminUser]
 
     def get(self, request):
-        return Response(MOCK_PROPERTIES)
+        properties = get_admin_property_queryset()
+        serializer = AdminPropertySerializer(properties, many=True)
+
+        return Response(
+            serializer.data,
+            status=status.HTTP_200_OK,
+        )
 
 
 class AdminPropertyUpdateAPIView(APIView):
     permission_classes = [IsAdminUser]
 
     def patch(self, request, pk):
-        property_item = next(
-            (item for item in MOCK_PROPERTIES if item["id"] == pk),
-            None,
-        )
-
-        if property_item is None:
-            return Response(
-                {"error": "Property not found."},
-                status=404,
-            )
-
-        if "status" not in request.data:
+        if not request.data:
             return Response(
                 {"error": "Status is required."},
-                status=400,
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
-        allowed_statuses = ["NEW", "PUBLISHED", "INACTIVE"]
-        new_status = request.data["status"]
+        if set(request.data.keys()) != {"status"}:
+            return Response(
+                {"error": "Only status can be updated."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
-        if new_status not in allowed_statuses:
+        new_status = request.data.get("status")
+
+        if (
+            not isinstance(new_status, str)
+            or new_status not in Property.Status.values
+        ):
             return Response(
                 {
                     "error": (
@@ -45,25 +94,54 @@ class AdminPropertyUpdateAPIView(APIView):
                         "NEW, PUBLISHED, INACTIVE."
                     )
                 },
-                status=400,
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
-        property_item["status"] = new_status
-
-        return Response(property_item, status=200)
-
-    def delete(self, request, pk):
-        property_item = next(
-            (item for item in MOCK_PROPERTIES if item["id"] == pk),
-            None,
-        )
-
-        if property_item is None:
+        try:
+            property_obj = get_admin_property_queryset().get(pk=pk)
+        except Property.DoesNotExist:
             return Response(
                 {"error": "Property not found."},
-                status=404,
+                status=status.HTTP_404_NOT_FOUND,
             )
 
-        MOCK_PROPERTIES.remove(property_item)
+        property_obj.status = new_status
+        property_obj.save(update_fields=["status", "updated_at"])
 
-        return Response(status=204)
+        return Response(
+            AdminPropertySerializer(property_obj).data,
+            status=status.HTTP_200_OK,
+        )
+
+    @transaction.atomic
+    def delete(self, request, pk):
+        try:
+            property_obj = (
+                Property.objects
+                .select_for_update()
+                .get(pk=pk)
+            )
+        except Property.DoesNotExist:
+            return Response(
+                {"error": "Property not found."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        has_bookings = property_obj.rental_units.filter(
+            bookings__isnull=False
+        ).exists()
+
+        if has_bookings:
+            return Response(
+                {
+                    "error": (
+                        "Cannot delete property because it has bookings. "
+                        "Set its status to INACTIVE instead."
+                    )
+                },
+                status=status.HTTP_409_CONFLICT,
+            )
+
+        property_obj.delete()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
