@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { getAdminProperties, updateAdminProperty, deleteAdminProperty } from '../../api/admin';
+import { getAdminProperties, updateAdminPropertyStatus, deleteAdminProperty } from '../../api/admin';
 
 const AdminProperties = () => {
     const [properties, setProperties] = useState([]);
@@ -12,12 +12,12 @@ const AdminProperties = () => {
         getAdminProperties().then(setProperties).catch(console.error);
     };
 
-    const togglePublished = async (id, isPublished) => {
+    const handleStatusChange = async (id, newStatus) => {
         try {
-            await updateAdminProperty(id, { is_published: !isPublished });
-            setProperties((prev) => prev.map((p) => (p.id === id ? { ...p, is_published: !isPublished } : p)));
+            await updateAdminPropertyStatus(id, newStatus);
+            setProperties((prev) => prev.map((p) => (p.id === id ? { ...p, status: newStatus } : p)));
         } catch (e) {
-            alert('Помилка оновлення');
+            alert('Помилка оновлення статусу');
         }
     };
 
