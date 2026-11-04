@@ -1,17 +1,16 @@
 
+from django.contrib.auth import authenticate
+from django.contrib.auth.models import User
+
 from rest_framework import status
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework.permissions import IsAuthenticated
-from rest_framework_simplejwt.exceptions import TokenError
-from django.contrib.auth import authenticate
 
-from mock_data import MOCK_USERS
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.exceptions import TokenError
 
 from .serializers import RegisterSerializer
-
 
 
 class ProfileAPIView(APIView):
@@ -36,16 +35,23 @@ class ProfileAPIView(APIView):
         user = request.user
         profile = user.profile
 
-        editable_user_fields = ["first_name", "last_name", "email"]
+        # Email cannot be changed
+        if "email" in request.data:
+            return Response(
+                {"email": "Changing email is not allowed."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        editable_user_fields = ["first_name", "last_name"]
         editable_profile_fields = ["phone", "avatar"]
 
         for field in editable_user_fields:
             if field in request.data:
                 value = request.data[field]
 
-                if not isinstance(value, str):
+                if not isinstance(value, str) or not value.strip():
                     return Response(
-                        {"detail": f"{field} must be a string."},
+                        {"detail": f"{field} cannot be empty."},
                         status=status.HTTP_400_BAD_REQUEST,
                     )
 
@@ -75,6 +81,7 @@ class RegisterAPIView(APIView):
     def post(self, request):
         serializer = RegisterSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+
         user = serializer.save()
 
         return Response(
@@ -83,6 +90,8 @@ class RegisterAPIView(APIView):
                 "user": {
                     "id": user.id,
                     "username": user.username,
+                    "first_name": user.first_name,
+                    "last_name": user.last_name,
                     "email": user.email,
                     "role": user.profile.role,
                 },
@@ -95,27 +104,42 @@ class LoginAPIView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
-        username = request.data.get("username")
+        email = request.data.get("email")
         password = request.data.get("password")
 
-        if not username or not password:
+        if not email or not password:
             return Response(
-                {"detail": "Username and password are required."},
+                {"detail": "Email and password are required."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        user = authenticate(
-            request,
-            username=username,
-            password=password,
+        # Find accounts by email.
+        # Existing duplicate emails are handled without choosing
+        # an arbitrary account.
+        candidates = User.objects.filter(
+            email__iexact=email.strip(),
+            is_active=True,
         )
 
-        if user is None:
+        authenticated_users = []
+
+        for candidate in candidates:
+            user = authenticate(
+                request,
+                username=candidate.username,
+                password=password,
+            )
+
+            if user is not None:
+                authenticated_users.append(user)
+
+        if len(authenticated_users) != 1:
             return Response(
-                {"detail": "Invalid username or password."},
+                {"detail": "Invalid email or password."},
                 status=status.HTTP_401_UNAUTHORIZED,
             )
 
+        user = authenticated_users[0]
         refresh = RefreshToken.for_user(user)
 
         return Response(
@@ -125,6 +149,8 @@ class LoginAPIView(APIView):
                 "user": {
                     "id": user.id,
                     "username": user.username,
+                    "first_name": user.first_name,
+                    "last_name": user.last_name,
                     "email": user.email,
                     "role": user.profile.role,
                 },
