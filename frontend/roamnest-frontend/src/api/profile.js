@@ -1,11 +1,11 @@
 import axiosClient from './axiosClient';
 
-export const getProfile = async (userId) => {
-    const response = await axiosClient.get('/profile/', { params: { user_id: userId } });
+export const getProfile = async () => {
+    const response = await axiosClient.get('/api/profile/');
     return response.data;
 };
 
-export const updateProfile = async (userId, data) => {
-    const response = await axiosClient.patch('/profile/', data, { params: { user_id: userId } });
+export const updateProfile = async (data) => {
+    const response = await axiosClient.patch('/api/profile/', data);
     return response.data;
 };
