@@ -1,0 +1,144 @@
+/* =========================================================
+   BASE: дизайн-токени, скидання стилів, типографіка, кнопки
+   ========================================================= */
+
+:root {
+    /* Кольори бренду */
+    --color-cream: #F6EAD4;        /* основний кремовий: поля, кнопки шапки */
+    --color-cream-light: #FAF6EE;  /* світлий фон блоків */
+    --color-yellow: #F5C770;       /* головна дія (кнопка «Пошук») */
+    --color-yellow-hover: #EDB54F;
+    --color-accent: #D18E25;       /* іконки, акценти */
+    --color-green-dark: #2F3A33;   /* шапка, футер */
+    --color-green: #3E7B57;        /* успіх, ціна */
+    --color-red: #C0463A;          /* помилки, скасування */
+
+    /* Текст */
+    --text-main: #2C2C2C;
+    --text-muted: #6B6B6B;
+    --text-light: #FFFFFF;
+
+    /* Фони та межі */
+    --bg-page: #FFFDF9;
+    --border: #E8DFCF;
+
+    /* Розміри */
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 20px;
+    --radius-pill: 50px;
+    --container: 1200px;
+    --header-height: 64px;
+
+    /* Тіні */
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
+    --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.12);
+
+    --font-family: 'Montserrat', 'Inter', system-ui, sans-serif;
+    --transition: 0.2s ease;
+}
+
+/* ---------- Скидання ---------- */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+    font-family: var(--font-family);
+    color: var(--text-main);
+    background-color: var(--bg-page);
+    line-height: 1.5;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+}
+
+img { max-width: 100%; display: block; }
+a { color: inherit; text-decoration: none; }
+button { cursor: pointer; border: none; background: none; font-family: inherit; }
+input, select, textarea { font-family: inherit; font-size: inherit; }
+
+/* ---------- Типографіка ---------- */
+h1 { font-size: clamp(28px, 4vw, 40px); font-weight: 800; line-height: 1.2; }
+h2 { font-size: clamp(22px, 3vw, 30px); font-weight: 700; line-height: 1.25; }
+h3 { font-size: 18px; font-weight: 700; }
+
+/* ---------- Кнопки ---------- */
+.btn-primary,
+.btn-secondary,
+.btn-success,
+.btn-danger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 24px;
+    border-radius: var(--radius-pill);
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1;
+    transition: background-color var(--transition), transform var(--transition), box-shadow var(--transition);
+}
+
+.btn-primary { background-color: var(--color-yellow); color: var(--text-main); }
+.btn-primary:hover { background-color: var(--color-yellow-hover); box-shadow: 0 4px 14px rgba(245, 199, 112, 0.45); }
+
+.btn-secondary { background-color: var(--color-cream); color: var(--text-main); }
+.btn-secondary:hover { background-color: #EFDDBB; }
+
+.btn-success { background-color: var(--color-green); color: var(--text-light); }
+.btn-success:hover { background-color: #33694A; }
+
+.btn-danger { background-color: transparent; color: var(--color-red); border: 1.5px solid var(--color-red); }
+.btn-danger:hover { background-color: var(--color-red); color: var(--text-light); }
+
+.btn-primary:active,
+.btn-secondary:active,
+.btn-success:active,
+.btn-danger:active { transform: scale(0.97); }
+
+.btn-w-150 { min-width: 150px; }
+
+:focus-visible { outline: 3px solid var(--color-accent); outline-offset: 2px; }
+
+/* ---------- Утиліти ---------- */
+.text-muted { color: var(--text-muted); }
+.text-green { color: var(--color-green); font-weight: 700; }
+.error-text {
+    color: var(--color-red);
+    background: #FBEAE8;
+    padding: 10px 14px;
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+}
+.mt-10 { margin-top: 10px; }
+.mt-30 { margin-top: 30px; }
+.flex-row-gap { display: flex; flex-wrap: wrap; gap: 12px; }
+
+.loader {
+    padding: 80px 20px;
+    text-align: center;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+/* Статуси бронювань (ТЗ п. 8.3) */
+.status-pending,
+.status-confirmed,
+.status-cancelled,
+.status-completed {
+    display: inline-block;
+    padding: 3px 12px;
+    border-radius: var(--radius-pill);
+    font-size: 13px;
+    font-weight: 600;
+}
+.status-pending   { background: #FDF1D8; color: #9A6510; }
+.status-confirmed { background: #E2F1E7; color: var(--color-green); }
+.status-cancelled { background: #FBEAE8; color: var(--color-red); }
+.status-completed { background: #ECECEC; color: var(--text-muted); }

@@ -99,14 +99,14 @@ const Header = () => {
                                     <div className="search-field">
                                         <span className="field-icon">📅</span>
                                         <div className="field-info">
-                                            <span className="field-label">Виїзд</span>
-                                            <span className="field-value">26.10.2026</span>
+                                            <span className="field-label">В'їзд</span>
+                                            <span className="field-value">Обрати дату</span>
                                         </div>
                                     </div>
                                     <div className="search-field">
                                         <span className="field-icon">📅</span>
                                         <div className="field-info">
-                                            <span className="field-label">В'їзд</span>
+                                            <span className="field-label">Виїзд</span>
                                             <span className="field-value">Обрати дату</span>
                                         </div>
                                     </div>
