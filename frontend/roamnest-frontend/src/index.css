@@ -394,3 +394,24 @@ button { cursor: pointer; border: none; font-family: inherit; }
     }
 }
 
+/* =========================================
+   ДОБАВЛЕНО ТОЛЬКО ДЛЯ ВЫРАВНИВАНИЯ (КОНТЕЙНЕРЫ)
+   ========================================= */
+.container {
+    max-width: 1280px; /* Максимальная ширина контента как на макете */
+    width: 100%;
+    margin: 0 auto; /* Центрируем */
+}
+
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 0 24px; /* Компенсируем padding у .top-nav */
+}
+
+.hero-content.container {
+    max-width: 1280px; /* Расширяем контейнер главного экрана, чтобы поиск был по центру */
+    padding: 0 24px;
+}
