@@ -1,5 +1,5 @@
 /* =========================================
-   БАЗОВІ НАЛАШТУВАННЯ (ЦВЕТА ИЗ МАКЕТА)
+    БАЗОВІ НАЛАШТУВАННЯ (ЦВЕТА ИЗ МАКЕТА)
    ========================================= */
 :root {
     --bg-cream: #F6EAD4; /* Светло-кремовый для текста и полей */
@@ -25,7 +25,7 @@ a { text-decoration: none; color: inherit; }
 button { cursor: pointer; border: none; font-family: inherit; }
 
 /* =========================================
-   HEADER (ВЕРХНЯЯ ПАНЕЛЬ)
+    HEADER (ВЕРХНЯЯ ПАНЕЛЬ)
    ========================================= */
 .header-wrapper {
     width: 100%;
@@ -105,7 +105,7 @@ button { cursor: pointer; border: none; font-family: inherit; }
 }
 
 /* =========================================
-   HERO SECTION (ГЛАВНЫЙ ЭКРАН С ФОНОМ)
+    HERO SECTION (ГЛАВНЫЙ ЭКРАН С ФОНОМ)
    ========================================= */
 .hero-section {
     position: relative;
@@ -174,7 +174,7 @@ button { cursor: pointer; border: none; font-family: inherit; }
 }
 
 /* =========================================
-   БЛОК ПОИСКА (СЛОЖНАЯ СТРУКТУРА)
+    БЛОК ПОИСКА (СЛОЖНАЯ СТРУКТУРА)
    ========================================= */
 .search-container {
     width: 100%;
@@ -300,3 +300,97 @@ button { cursor: pointer; border: none; font-family: inherit; }
 .main-search-btn:hover {
     transform: scale(1.05);
 }
+
+
+/* =========================================
+    SITE FOOTER (1 В 1 С МАКЕТОМ)
+   ========================================= */
+.site-footer {
+    background-color: #4F5B46; /* Оливковый цвет из пипетки */
+    width: 100%;
+    padding: 40px 0; /* Отступы сверху и снизу */
+    margin-top: auto;
+}
+
+.footer-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 60px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center; /* Логотип по центру вертикали */
+}
+
+/* Логотип */
+.footer-brand {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    text-decoration: none;
+    flex-shrink: 0;
+}
+
+.footer-logo-text {
+    font-family: 'Montserrat', 'Inter', sans-serif;
+    font-size: 42px;
+    font-weight: 700;
+    color: #F2D59D; /* Кремово-желтый цвет */
+    letter-spacing: -0.5px;
+}
+
+/* Колонки */
+.footer-links-wrapper {
+    display: flex;
+    gap: 100px; /* Расстояние между колонками */
+    align-items: flex-start;
+}
+
+.footer-col {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.footer-heading {
+    color: #FFFFFF;
+    font-family: 'Montserrat', 'Inter', sans-serif;
+    font-size: 20px;
+    font-weight: 500;
+    margin-bottom: 10px; /* Отступ от заголовка до ссылок */
+}
+
+.footer-link {
+    color: #E0E0E0; /* Светло-серый цвет ссылок */
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    text-decoration: none;
+    font-weight: 300;
+    transition: color 0.2s ease;
+}
+
+.footer-link:hover {
+    color: #FFFFFF;
+    text-decoration: underline;
+}
+
+/* Чтобы на экранах поменьше ничего не ломалось */
+@media (max-width: 1200px) {
+    .footer-links-wrapper {
+        gap: 50px;
+    }
+    .footer-logo-text {
+        font-size: 32px;
+    }
+}
+
+@media (max-width: 900px) {
+    .footer-container {
+        flex-direction: column;
+        gap: 40px;
+    }
+    .footer-links-wrapper {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+}
+
