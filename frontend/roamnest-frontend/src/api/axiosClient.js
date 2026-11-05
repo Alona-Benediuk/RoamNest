@@ -7,7 +7,6 @@ const axiosClient = axios.create({
     },
 });
 
-// Добавляем JWT access token к каждому запросу
 axiosClient.interceptors.request.use(
     (config) => {
         const token = localStorage.getItem('access_token');
@@ -19,7 +18,6 @@ axiosClient.interceptors.request.use(
     (error) => Promise.reject(error)
 );
 
-// Обновляем токен при 401
 axiosClient.interceptors.response.use(
     (response) => response,
     async (error) => {
@@ -30,7 +28,6 @@ axiosClient.interceptors.response.use(
                 const refreshToken = localStorage.getItem('refresh_token');
                 if (!refreshToken) throw new Error('No refresh token');
                 
-                // Обрати внимание: путь теперь с /api/
                 const { data } = await axios.post(
                     `${axiosClient.defaults.baseURL}/api/auth/refresh/`,
                     { refresh: refreshToken }
