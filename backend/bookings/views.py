@@ -103,8 +103,8 @@ class BookingListAPIView(APIView):
                 status=status.HTTP_403_FORBIDDEN,
             )
 
-        # Çíàõîäèìî îïóáë³êîâàíå ïîìåøêàííÿ
-        # ç îïóáë³êîâàíîþ îäèíèöåþ æèòëà.
+        # Ð—Ð½Ð°Ñ…Ð¾Ð´Ð¸Ð¼Ð¾ Ð¾Ð¿ÑƒÐ±Ð»Ñ–ÐºÐ¾Ð²Ð°Ð½Ðµ Ð¿Ð¾Ð¼ÐµÑˆÐºÐ°Ð½Ð½Ñ
+        # Ð· Ð¾Ð¿ÑƒÐ±Ð»Ñ–ÐºÐ¾Ð²Ð°Ð½Ð¾ÑŽ Ð¾Ð´Ð¸Ð½Ð¸Ñ†ÐµÑŽ Ð¶Ð¸Ñ‚Ð»Ð°.
         property_data = next(
             (
                 item
@@ -142,7 +142,7 @@ class BookingListAPIView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        # Ïåðåâ³ðÿºìî ïåðåòèí äàò ç ³íøèìè áðîíþâàííÿìè.
+        # ÐŸÐµÑ€ÐµÐ²Ñ–Ñ€ÑÑ”Ð¼Ð¾ Ð¿ÐµÑ€ÐµÑ‚Ð¸Ð½ Ð´Ð°Ñ‚ Ð· Ñ–Ð½ÑˆÐ¸Ð¼Ð¸ Ð±Ñ€Ð¾Ð½ÑŽÐ²Ð°Ð½Ð½ÑÐ¼Ð¸.
         overlapping_bookings = [
             booking
             for booking in MOCK_BOOKINGS
@@ -154,7 +154,7 @@ class BookingListAPIView(APIView):
             )
         ]
 
-        # Ê³ëüê³ñòü îäíî÷àñíî äîñòóïíèõ îäèíèöü æèòëà.
+        # ÐšÑ–Ð»ÑŒÐºÑ–ÑÑ‚ÑŒ Ð¾Ð´Ð½Ð¾Ñ‡Ð°ÑÐ½Ð¾ Ð´Ð¾ÑÑ‚ÑƒÐ¿Ð½Ð¸Ñ… Ð¾Ð´Ð¸Ð½Ð¸Ñ†ÑŒ Ð¶Ð¸Ñ‚Ð»Ð°.
         rooms_count = rental_unit_data.get("rooms_count", 1)
 
         if len(overlapping_bookings) >= rooms_count:

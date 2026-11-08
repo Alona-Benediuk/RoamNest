@@ -94,7 +94,7 @@ class BookingSerializer(serializers.ModelSerializer):
                 ],
             )
 
-            # Під час оновлення не враховуємо поточне бронювання.
+            # РџС–Рґ С‡Р°СЃ РѕРЅРѕРІР»РµРЅРЅСЏ РЅРµ РІСЂР°С…РѕРІСѓС”РјРѕ РїРѕС‚РѕС‡РЅРµ Р±СЂРѕРЅСЋРІР°РЅРЅСЏ.
             if self.instance:
                 overlapping_bookings = overlapping_bookings.exclude(
                     pk=self.instance.pk

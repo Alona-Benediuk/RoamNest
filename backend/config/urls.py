@@ -19,7 +19,9 @@ from django.contrib import admin
 from rest_framework_simplejwt.views import TokenRefreshView
 from properties.views import (
     AmenityListAPIView,
+    CategoryListAPIView,
     OwnerPropertyListAPIView,
+    PropertyCollectionListAPIView,
 )
 from accounts.views import (
     ProfileAPIView,
@@ -29,7 +31,16 @@ from accounts.views import (
     LogoutAPIView,
 )
 from accounts.admin_views import AdminUserListAPIView, AdminUserUpdateAPIView
-from properties.admin_views import AdminPropertyListAPIView, AdminPropertyUpdateAPIView
+
+from properties.admin_views import (
+    AdminPropertyListAPIView,
+    AdminPropertyUpdateAPIView,
+    AdminCategoryListCreateAPIView,
+    AdminCategoryDetailAPIView,
+    AdminPropertyCollectionListCreateAPIView,
+    AdminPropertyCollectionDetailAPIView,
+)
+
 from bookings.views import OwnerBookingListAPIView, OwnerBookingUpdateAPIView
 
 
@@ -38,6 +49,8 @@ urlpatterns = [
     path("api/properties/", include("properties.urls")),
     path("api/bookings/", include("bookings.urls")),
     path("api/amenities/", AmenityListAPIView.as_view(), name="amenity-list"),
+    path("api/categories/", CategoryListAPIView.as_view(), name="category-list"),
+    path("api/collections/", PropertyCollectionListAPIView.as_view(), name="collection-list"),
     path("api/profile/", ProfileAPIView.as_view(), name="profile"),
     path("api/auth/register/", RegisterAPIView.as_view(), name="register"),
     path("api/auth/login/", LoginAPIView.as_view(), name="login"),
@@ -48,6 +61,10 @@ urlpatterns = [
     path("api/admin/users/<int:pk>/", AdminUserUpdateAPIView.as_view(), name="admin-user-update"),
     path("api/admin/properties/", AdminPropertyListAPIView.as_view(), name="admin-property-list"),
     path("api/admin/properties/<int:pk>/", AdminPropertyUpdateAPIView.as_view(), name="admin-property-update"),
+    path("api/admin/categories/", AdminCategoryListCreateAPIView.as_view(), name="admin-category-list-create"),
+    path("api/admin/categories/<int:pk>/", AdminCategoryDetailAPIView.as_view(), name="admin-category-detail"),
+    path("api/admin/collections/", AdminPropertyCollectionListCreateAPIView.as_view(), name="admin-collection-list-create"),
+    path("api/admin/collections/<int:pk>/", AdminPropertyCollectionDetailAPIView.as_view(), name="admin-collection-detail"),
     path("api/owner/properties/", OwnerPropertyListAPIView.as_view(), name="owner-property-list"),
     path("api/owner/bookings/", OwnerBookingListAPIView.as_view(), name="owner-booking-list"),
     path("api/owner/bookings/<int:pk>/", OwnerBookingUpdateAPIView.as_view(), name="owner-booking-update"),

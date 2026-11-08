@@ -1,4 +1,4 @@
-﻿from django.db import transaction
+from django.db import transaction
 
 from rest_framework import status, serializers
 from rest_framework.response import Response
@@ -6,11 +6,12 @@ from rest_framework.views import APIView
 
 from accounts.admin_views import IsAdminUser
 
-from .models import Property
+from .models import Property, Category, PropertyCollection
 from .serializers import (
     AmenitySerializer,
     RentalUnitSerializer,
     PropertyImageSerializer,
+    CategorySerializer,
 )
 
 
@@ -36,6 +37,45 @@ class AdminPropertySerializer(serializers.ModelSerializer):
             "rental_units",
             "images",
         ]
+
+
+class AdminCategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = [
+            "id",
+            "name",
+            "slug",
+            "description",
+            "image_url",
+            "sort_order",
+            "is_active",
+        ]
+        read_only_fields = ["id"]
+
+
+class AdminPropertyCollectionSerializer(serializers.ModelSerializer):
+    properties = serializers.PrimaryKeyRelatedField(
+        many=True,
+        queryset=Property.objects.filter(
+            status=Property.Status.PUBLISHED
+        ),
+        required=False,
+    )
+
+    class Meta:
+        model = PropertyCollection
+        fields = [
+            "id",
+            "name",
+            "slug",
+            "description",
+            "image_url",
+            "sort_order",
+            "is_active",
+            "properties",
+        ]
+        read_only_fields = ["id"]
 
 
 def get_admin_property_queryset():
@@ -145,3 +185,132 @@ class AdminPropertyUpdateAPIView(APIView):
         property_obj.delete()
 
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class AdminCategoryListCreateAPIView(APIView):
+    permission_classes = [IsAdminUser]
+
+    def get(self, request):
+        categories = Category.objects.all().order_by(
+            "sort_order",
+            "name",
+        )
+
+        serializer = AdminCategorySerializer(
+            categories,
+            many=True,
+        )
+
+        return Response(serializer.data)
+
+    def post(self, request):
+        serializer = AdminCategorySerializer(data=request.data)
+
+        if not serializer.is_valid():
+            return Response(
+                serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        category = serializer.save()
+
+        return Response(
+            AdminCategorySerializer(category).data,
+            status=status.HTTP_201_CREATED,
+        )
+
+
+class AdminCategoryDetailAPIView(APIView):
+    permission_classes = [IsAdminUser]
+
+    def patch(self, request, pk):
+        try:
+            category = Category.objects.get(pk=pk)
+        except Category.DoesNotExist:
+            return Response(
+                {"error": "Category not found."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        serializer = AdminCategorySerializer(
+            category,
+            data=request.data,
+            partial=True,
+        )
+
+        if not serializer.is_valid():
+            return Response(
+                serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        category = serializer.save()
+
+        return Response(
+            AdminCategorySerializer(category).data,
+            status=status.HTTP_200_OK,
+        )
+
+
+class AdminPropertyCollectionListCreateAPIView(APIView):
+    permission_classes = [IsAdminUser]
+
+    def get(self, request):
+        collections = PropertyCollection.objects.all().prefetch_related(
+            "properties"
+        ).order_by("sort_order", "name")
+
+        serializer = AdminPropertyCollectionSerializer(
+            collections,
+            many=True,
+        )
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request):
+        serializer = AdminPropertyCollectionSerializer(data=request.data)
+
+        if not serializer.is_valid():
+            return Response(
+                serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        collection = serializer.save()
+
+        return Response(
+            AdminPropertyCollectionSerializer(collection).data,
+            status=status.HTTP_201_CREATED,
+        )
+
+
+class AdminPropertyCollectionDetailAPIView(APIView):
+    permission_classes = [IsAdminUser]
+
+    def patch(self, request, pk):
+        try:
+            collection = PropertyCollection.objects.get(pk=pk)
+        except PropertyCollection.DoesNotExist:
+            return Response(
+                {"error": "Collection not found."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        serializer = AdminPropertyCollectionSerializer(
+            collection,
+            data=request.data,
+            partial=True,
+        )
+
+        if not serializer.is_valid():
+            return Response(
+                serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        collection = serializer.save()
+
+        return Response(
+            AdminPropertyCollectionSerializer(collection).data,
+            status=status.HTTP_200_OK,
+        )

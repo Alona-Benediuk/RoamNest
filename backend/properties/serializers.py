@@ -1,13 +1,26 @@
-﻿
+
 from rest_framework import serializers
 
-from .models import Property, RentalUnit, Amenity, PropertyImage
+from .models import Property, RentalUnit, Amenity, PropertyImage, Category, PropertyCollection
 
 
 class AmenitySerializer(serializers.ModelSerializer):
     class Meta:
         model = Amenity
         fields = ["id", "name"]
+
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = [
+            "id",
+            "name",
+            "slug",
+            "description",
+            "image_url",
+            "sort_order",
+        ]
 
 
 class PropertyImageSerializer(serializers.ModelSerializer):
@@ -68,6 +81,7 @@ class PropertyListSerializer(serializers.ModelSerializer):
     rental_units = RentalUnitSerializer(many=True, read_only=True)
     amenities = AmenitySerializer(many=True, read_only=True)
     images = PropertyImageSerializer(many=True, read_only=True)
+    categories = CategorySerializer(many=True, read_only=True)
 
     class Meta:
         model = Property
@@ -81,8 +95,25 @@ class PropertyListSerializer(serializers.ModelSerializer):
             "country",
             "status",
             "amenities",
+            "categories",
             "rental_units",
             "images",
+        ]
+
+
+class PropertyCollectionSerializer(serializers.ModelSerializer):
+    properties = PropertyListSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = PropertyCollection
+        fields = [
+            "id",
+            "name",
+            "slug",
+            "description",
+            "image_url",
+            "sort_order",
+            "properties",
         ]
 
 

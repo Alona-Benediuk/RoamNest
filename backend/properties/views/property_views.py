@@ -1,4 +1,4 @@
-﻿
+
 from decimal import Decimal, InvalidOperation
 
 from django.db.models import Min, Q, Prefetch
@@ -8,7 +8,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from ..models import Amenity, Property, RentalUnit
+from ..models import Amenity, Category, Property, RentalUnit
 from ..serializers import PropertyListSerializer
 
 
@@ -18,6 +18,12 @@ class PropertyCreateSerializer(serializers.ModelSerializer):
             queryset=Amenity.objects.all(),
             required=False,
         )
+
+    categories = serializers.PrimaryKeyRelatedField(
+        many=True,
+        queryset=Category.objects.filter(is_active=True),
+        required=False,
+    )
 
     class Meta:
         model = Property
@@ -29,6 +35,7 @@ class PropertyCreateSerializer(serializers.ModelSerializer):
             "city",
             "country",
             "amenities",
+            "categories",
         ]
 
 
@@ -107,6 +114,7 @@ class PropertyListAPIView(APIView):
         max_price = request.query_params.get("max_price")
         max_guests = request.query_params.get("max_guests")
         amenities = request.query_params.getlist("amenities")
+        category = request.query_params.get("category")
         ordering = request.query_params.get("ordering")
 
         # Перевіряємо числові параметри.
@@ -186,6 +194,12 @@ class PropertyListAPIView(APIView):
                 property_type__iexact=property_type
             )
 
+        if category:
+            properties = properties.filter(
+                categories__slug=category,
+                categories__is_active=True,
+            )
+
         # Усі цінові фільтри та фільтри місткості
         # мають відповідати одній одиниці оренди.
         rental_unit_filters_used = any(
@@ -246,6 +260,7 @@ class PropertyListAPIView(APIView):
             ),
             "amenities",
             "images",
+            "categories",
         ).distinct()
 
         serializer = PropertyListSerializer(properties, many=True)
@@ -274,6 +289,7 @@ class PropertyDetailAPIView(APIView):
                 ),
                 "amenities",
                 "images",
+                "categories",
             ).get(
                 pk=pk,
                 status=Property.Status.PUBLISHED,
@@ -372,6 +388,7 @@ class OwnerPropertyListAPIView(APIView):
                 "rental_units__amenities",
                 "rental_units__images",
                 "images",
+                "categories",
             )
             .order_by("-created_at")
         )
