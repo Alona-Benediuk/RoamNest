@@ -1,32 +1,36 @@
-
+﻿
 from django.contrib.auth.models import User
+from django.contrib.auth.password_validation import validate_password as django_validate_password
 from django.db import transaction
 from django.utils.text import slugify
+from django.core.exceptions import ValidationError as DjangoValidationError
+
 from rest_framework import serializers
 
 from .models import Profile
 
 
 class RegisterSerializer(serializers.ModelSerializer):
+
     username = serializers.CharField(
         required=False,
         allow_blank=True,
         max_length=150,
     )
 
-    email = serializers.EmailField(
-        required=True,
-    )
-
     first_name = serializers.CharField(
         required=True,
         max_length=150,
+        trim_whitespace=True,
     )
 
     last_name = serializers.CharField(
         required=True,
         max_length=150,
+        trim_whitespace=True,
     )
+
+    email = serializers.EmailField(required=True)
 
     password = serializers.CharField(
         write_only=True,
@@ -35,6 +39,14 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     password_confirm = serializers.CharField(
         write_only=True,
+        required=True,
+    )
+
+    role = serializers.ChoiceField(
+        choices=[
+            (Profile.Role.USER, "Гість"),
+            (Profile.Role.OWNER, "Власник"),
+        ],
         required=True,
     )
 
@@ -47,6 +59,7 @@ class RegisterSerializer(serializers.ModelSerializer):
             "email",
             "password",
             "password_confirm",
+            "role",
         ]
 
     def validate_email(self, value):
@@ -71,6 +84,30 @@ class RegisterSerializer(serializers.ModelSerializer):
 
         return username
 
+    def validate_last_name(self, value):
+        if not value.strip():
+            raise serializers.ValidationError(
+                "Прізвище обов'язкове."
+            )
+
+        return value.strip()
+
+    def validate_first_name(self, value):
+        if not value.strip():
+            raise serializers.ValidationError(
+                "Ім'я обов'язкове."
+            )
+
+        return value.strip()
+
+    def validate_password(self, value):
+        try:
+            django_validate_password(value)
+        except DjangoValidationError as error:
+            raise serializers.ValidationError(error.messages)
+
+        return value
+
     def validate(self, attrs):
         if attrs["password"] != attrs["password_confirm"]:
             raise serializers.ValidationError({
@@ -84,6 +121,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         password = validated_data.pop("password")
         validated_data.pop("password_confirm")
 
+        role = validated_data.pop("role")
         username = validated_data.pop("username", "").strip()
 
         if not username:
@@ -109,6 +147,9 @@ class RegisterSerializer(serializers.ModelSerializer):
             **validated_data,
         )
 
-        Profile.objects.create(user=user)
+        Profile.objects.create(
+            user=user,
+            role=role,
+        )
 
         return user
