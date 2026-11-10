@@ -21,6 +21,18 @@ from datetime import timedelta
 BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / ".env")
 
+# Object Storage (Supabase S3 / Amazon S3)
+STORAGE_ENDPOINT_URL = os.getenv("STORAGE_ENDPOINT_URL")
+STORAGE_REGION = os.getenv("STORAGE_REGION")
+STORAGE_ACCESS_KEY_ID = os.getenv("STORAGE_ACCESS_KEY_ID")
+STORAGE_SECRET_ACCESS_KEY = os.getenv("STORAGE_SECRET_ACCESS_KEY")
+STORAGE_BUCKET_NAME = os.getenv("STORAGE_BUCKET_NAME")
+STORAGE_PUBLIC_BASE_URL = os.getenv("STORAGE_PUBLIC_BASE_URL", "").rstrip("/")
+
+STORAGE_ADDRESSING_STYLE = os.getenv(
+    "STORAGE_ADDRESSING_STYLE",
+    "path",
+)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/

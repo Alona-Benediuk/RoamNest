@@ -1,4 +1,4 @@
-
+﻿
 from django.conf import settings
 from django.db import models
 
@@ -148,6 +148,11 @@ class PropertyImage(models.Model):
         blank=True,
     )
     image_url = models.URLField(max_length=500)
+    image_key = models.CharField(
+        max_length=500,
+        blank=True,
+        default="",
+    )
     is_main = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
