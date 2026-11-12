@@ -1,7 +1,23 @@
-
+﻿from datetime import date
 from decimal import Decimal, InvalidOperation
 
-from django.db.models import Min, Q, Prefetch
+from django.db.models import (
+    Count,
+    Exists,
+    F,
+    IntegerField,
+    Min,
+    OuterRef,
+    Prefetch,
+    Q,
+    Subquery,
+    Sum,
+    Value,
+)
+from django.db.models.functions import Coalesce
+from django.utils import timezone
+
+from bookings.models import Booking
 
 from rest_framework import serializers, status
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -10,7 +26,6 @@ from rest_framework.views import APIView
 
 from ..models import Amenity, Category, Property, RentalUnit
 from ..serializers import PropertyListSerializer
-
 
 class PropertyCreateSerializer(serializers.ModelSerializer):
     amenities = serializers.PrimaryKeyRelatedField(
@@ -102,6 +117,83 @@ def _create_property(request):
     )
 
 
+def _filter_available_rental_units(
+    rental_unit_query,
+    check_in,
+    check_out,
+    guests,
+):
+    # Активні бронювання, які перетинаються з обраним періодом.
+    overlapping_bookings = Booking.objects.filter(
+        rental_unit_id=OuterRef("pk"),
+        status__in=[
+            Booking.Status.PENDING,
+            Booking.Status.CONFIRMED,
+        ],
+        check_in__lt=check_out,
+        check_out__gt=check_in,
+    )
+
+    # Кількість активних бронювань.
+    booking_count_subquery = (
+        overlapping_bookings
+        .order_by()
+        .values("rental_unit_id")
+        .annotate(total=Count("id"))
+        .values("total")[:1]
+    )
+
+    # Сумарна кількість гостей у HOSTEL.
+    occupied_beds_subquery = (
+        overlapping_bookings
+        .order_by()
+        .values("rental_unit_id")
+        .annotate(total=Sum("guests"))
+        .values("total")[:1]
+    )
+
+    rental_unit_query = rental_unit_query.annotate(
+        overlapping_booking_count=Coalesce(
+            Subquery(
+                booking_count_subquery,
+                output_field=IntegerField(),
+            ),
+            Value(0),
+        ),
+        occupied_beds=Coalesce(
+            Subquery(
+                occupied_beds_subquery,
+                output_field=IntegerField(),
+            ),
+            Value(0),
+        ),
+        has_overlapping_bookings=Exists(overlapping_bookings),
+    )
+
+    hotel = Property.PropertyType.HOTEL
+    hostel = Property.PropertyType.HOSTEL
+
+    # HOTEL: має залишатися хоча б одна вільна кімната.
+    # HOSTEL: має вистачати вільних ліжок для всіх гостей.
+    # Інші типи: не повинно бути жодного перетину бронювань.
+    return rental_unit_query.filter(
+        Q(
+            property__property_type=hotel,
+            rooms_count__gt=F("overlapping_booking_count"),
+        )
+        |
+        Q(
+            property__property_type=hostel,
+            rooms_count__gte=F("occupied_beds") + Value(guests),
+        )
+        |
+        (
+            ~Q(property__property_type__in=[hotel, hostel])
+            & Q(has_overlapping_bookings=False)
+        )
+    )
+
+
 class PropertyListAPIView(APIView):
     permission_classes = [AllowAny]
 
@@ -116,6 +208,62 @@ class PropertyListAPIView(APIView):
         amenities = request.query_params.getlist("amenities")
         category = request.query_params.get("category")
         ordering = request.query_params.get("ordering")
+
+        # Отримуємо дати заїзду та виїзду.
+        check_in = request.query_params.get("check_in")
+        check_out = request.query_params.get("check_out")
+
+        check_in_date = None
+        check_out_date = None
+
+        # Дати потрібно передавати тільки разом.
+        if (check_in is None) != (check_out is None):
+            return Response(
+                {
+                    "detail": (
+                        "Both check_in and check_out are required."
+                    )
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if check_in is not None:
+            try:
+                check_in_date = date.fromisoformat(check_in)
+                check_out_date = date.fromisoformat(check_out)
+
+                # Перевіряємо точний формат YYYY-MM-DD.
+                if (
+                    check_in_date.isoformat() != check_in
+                    or check_out_date.isoformat() != check_out
+                ):
+                    raise ValueError
+
+            except (ValueError, TypeError):
+                return Response(
+                    {
+                        "detail": (
+                            "Dates must be in YYYY-MM-DD format."
+                        )
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            if check_in_date < timezone.localdate():
+                return Response(
+                    {"detail": "Check-in cannot be in the past."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            if check_out_date <= check_in_date:
+                return Response(
+                    {
+                        "detail": (
+                            "Check-out must be after check-in."
+                        )
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
         # Перевіряємо числові параметри.
         try:
@@ -160,8 +308,18 @@ class PropertyListAPIView(APIView):
         rental_unit_query = RentalUnit.objects.filter(is_published=True)
 
         if guests_count is not None:
+            hostel = Property.PropertyType.HOSTEL
+
             rental_unit_query = rental_unit_query.filter(
-                max_guests__gte=guests_count
+                Q(
+                    property__property_type=hostel,
+                    rooms_count__gte=guests_count,
+                )
+                |
+                (
+                    ~Q(property__property_type=hostel)
+                    & Q(max_guests__gte=guests_count)
+                )
             )
 
         if max_guests_count is not None:
@@ -177,6 +335,17 @@ class PropertyListAPIView(APIView):
         if maximum is not None:
             rental_unit_query = rental_unit_query.filter(
                 price_per_night__lte=maximum
+            )
+
+        # Перевіряємо доступність на обрані дати.
+        dates_filter_used = check_in_date is not None
+
+        if dates_filter_used:
+            rental_unit_query = _filter_available_rental_units(
+                rental_unit_query,
+                check_in_date,
+                check_out_date,
+                guests_count or 1,
             )
 
         properties = Property.objects.filter(
@@ -202,14 +371,17 @@ class PropertyListAPIView(APIView):
 
         # Усі цінові фільтри та фільтри місткості
         # мають відповідати одній одиниці оренди.
-        rental_unit_filters_used = any(
-            value is not None
-            for value in (
-                guests_count,
-                max_guests_count,
-                minimum,
-                maximum,
+        rental_unit_filters_used = (
+            any(
+                value is not None
+                for value in (
+                    guests_count,
+                    max_guests_count,
+                    minimum,
+                    maximum,
+                )
             )
+            or dates_filter_used
         )
 
         if rental_unit_filters_used:
@@ -237,7 +409,7 @@ class PropertyListAPIView(APIView):
             properties = properties.annotate(
                 min_rental_unit_price=Min(
                     "rental_units__price_per_night",
-                    filter=Q(rental_units__is_published=True),
+                    filter=Q(rental_units__in=rental_unit_query),
                 )
             ).filter(min_rental_unit_price__isnull=False)
 
