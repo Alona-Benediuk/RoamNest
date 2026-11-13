@@ -4,11 +4,6 @@ import './PropertyCard.css';
 
 const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?q=80&w=800&auto=format&fit=crop';
 
-/*
- * Перетворює об'єкт з API (GET /api/properties/) на дані для картки.
- * Ціна та кількість гостей зберігаються в кімнатах (rental_units),
- * тому беремо мінімальну ціну і максимальну кількість гостей.
- */
 const toCardData = (property) => {
     const units = property.rental_units || [];
     const prices = units.map((u) => Number(u.price_per_night)).filter(Boolean);
@@ -26,7 +21,6 @@ const toCardData = (property) => {
     };
 };
 
-// Дати раннього бронювання: через місяць від сьогодні, на 3 ночі. Формат як у макеті: «Груд 13 - Груд 16»
 const MONTHS = ['Січ', 'Лют', 'Бер', 'Квіт', 'Трав', 'Черв', 'Лип', 'Серп', 'Вер', 'Жовт', 'Лист', 'Груд'];
 const formatDay = (d) => `${MONTHS[d.getMonth()]} ${d.getDate()}`;
 const getDealDates = (nights) => {
@@ -48,17 +42,14 @@ const HeartIcon = ({ filled }) => (
     </svg>
 );
 
-/**
- * Картка житла (ТЗ п. 4.4).
- * variant="deal" — картка «Раннього бронювання»: сума за кілька ночей і дати.
- */
+
 const PropertyCard = ({ property, variant = 'default', nights = 3 }) => {
     const [isFavorite, setIsFavorite] = useState(false);
     const card = toCardData(property);
     const isDeal = variant === 'deal';
 
     const toggleFavorite = (e) => {
-        e.preventDefault(); // щоб клік по сердечку не відкривав сторінку об'єкта
+        e.preventDefault();
         setIsFavorite((v) => !v);
     };
 

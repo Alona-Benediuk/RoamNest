@@ -1,8 +1,3 @@
-/* =========================================================
-   Рядок списку «Варіанти проживання» (за макетом Figma)
-   Макет: 1167 × 255, радіус 50px, тінь 0 4 4 rgba(0,0,0,.25)
-   ========================================================= */
-
 .rn-list-card {
     --lc-green: #26382E;
     --lc-cream: #FFF6ED;
@@ -20,7 +15,6 @@
 }
 .rn-list-card:hover { transform: translateY(-3px); box-shadow: 0 10px 22px rgba(0, 0, 0, 0.18); }
 
-/* ---------- Фото ліворуч ---------- */
 .rn-list-card__media {
     position: relative;
     flex: 0 0 44%;
@@ -40,7 +34,6 @@
 }
 .rn-list-card:hover .rn-list-card__media img { transform: scale(1.05); }
 
-/* Помаранчеві рисочки-індикатор фото внизу */
 .rn-list-card__dots {
     position: absolute;
     left: 50%;
@@ -58,15 +51,13 @@
 }
 .rn-list-card__dots i.is-active { opacity: 1; }
 
-/* ---------- Текстова частина: заходить на фото плавною хвилею ---------- */
 .rn-list-card__content {
     position: relative;
-    --wave: clamp(56px, 5vw, 96px);              /* ширина хвилі */
+    --wave: clamp(56px, 5vw, 96px);
     flex: 1;
-    margin-left: calc(-1 * var(--wave));         /* текстова частина заходить на фото */
-    /* відступ зліва більший за хвилю, щоб текст ніколи не лягав на фото */
+    margin-left: calc(-1 * var(--wave));
     padding: clamp(14px, 1.2vw, 22px) clamp(70px, 6vw, 110px) clamp(14px, 1.2vw, 22px) calc(var(--wave) + 12px);
-    border-radius: var(--wave) 0 0 0 / 100% 0 0 0;  /* плавна хвиля зліва, як у макеті */
+    border-radius: var(--wave) 0 0 0 / 100% 0 0 0;
     background-color: var(--lc-cream);
     color: var(--lc-green);
 }
@@ -87,7 +78,6 @@
     color: rgba(38, 56, 46, 0.7);
 }
 
-/* Зручності — темно-сині кружечки з іконками */
 .rn-list-card__amenities {
     position: absolute;
     left: calc(var(--wave) + 12px);
@@ -125,7 +115,6 @@
 .rn-list-card__heart:hover { background-color: #FFE4B9; }
 .rn-list-card__heart:active { transform: scale(0.88); }
 
-/* ---------- Ціна та рейтинг справа внизу ---------- */
 .rn-list-card__footer {
     position: absolute;
     right: clamp(14px, 1.3vw, 26px);
@@ -179,7 +168,6 @@
     color: rgba(38, 56, 46, 0.7);
 }
 
-/* Текст лише для екранних читалок */
 .visually-hidden {
     position: absolute;
     width: 1px;
@@ -189,7 +177,6 @@
     white-space: nowrap;
 }
 
-/* ---------- Телефон: фото зверху, текст під ним ---------- */
 @media (max-width: 640px) {
     .rn-list-card { flex-direction: column; border-radius: 28px; }
     .rn-list-card__media { flex-basis: auto; aspect-ratio: 16 / 9; }

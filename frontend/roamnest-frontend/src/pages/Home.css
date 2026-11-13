@@ -1,22 +1,10 @@
-/* =========================================================
-   Головна сторінка — секції під банером (за макетом Figma)
-   Макет зроблено під ширину екрана 1920px, контент — 1760px.
-   Кольори з макета:
-     accent  #26382E (темно-зелений)
-     main    #FCC05F (жовтий)
-     фон     #FFF6EC, картка #FFE5B6, ціна #FF9800
-   ========================================================= */
-
-/* Фото банера з макета (файл src/assets/hero.jpg).
-   Шлях відносний: Vite сам підключає файл і покаже помилку, якщо його немає */
 .hero-bg-image {
     background-image: url('../assets/hero.jpg') !important;
     background-size: cover !important;
-    background-position: center 60% !important;     /* у кадрі пальми й море */
-    opacity: 0.89;                                   /* у макеті: прозорість фото 89% */
+    background-position: center 60% !important;
+    opacity: 0.89;
 }
 
-/* Затемнення фото банера як у макеті: #403931, 50% */
 .hero-overlay {
     background-color: rgba(64, 57, 49, 0.5) !important;
 }
@@ -35,7 +23,6 @@
     background-color: var(--rn-cream);
 }
 
-/* М'які жовті «плями» на фоні */
 .rn-home::before,
 .rn-home::after {
     content: '';
@@ -75,7 +62,6 @@
     margin-bottom: 24px;
 }
 
-/* Темно-зелена «вкладка»: у макеті 423 × 76, радіус 200/200/0/200 */
 .rn-section__title {
     min-width: clamp(200px, 22vw, 423px);
     padding: clamp(12px, 1.25vw, 24px) clamp(20px, 1.9vw, 36px);
@@ -87,7 +73,6 @@
     line-height: 1.1;
 }
 
-/* «Дивитись далі»: у макеті 277 × 52, радіус 73, рамка 2px */
 .rn-section__more {
     min-width: clamp(140px, 14.4vw, 277px);
     padding: clamp(8px, 0.7vw, 13px) clamp(16px, 1.9vw, 36px);
@@ -128,7 +113,6 @@
 }
 .rn-tabs__tab:hover { background-color: var(--rn-peach); }
 
-/* Активна вкладка «зливається» з темно-зеленою панеллю */
 .rn-tabs__tab.is-active {
     margin-bottom: 0;
     padding: clamp(12px, 1vw, 20px) clamp(28px, 3vw, 56px);
@@ -161,7 +145,14 @@
 
 .rn-carousel__item { scroll-snap-align: start; display: flex; }
 
-/* Смуга прогресу прокрутки */
+.rn-carousel__track { cursor: grab; }
+.rn-carousel__track.is-dragging {
+    cursor: grabbing;
+    scroll-snap-type: none;
+    user-select: none;
+}
+
+/* Смуга прогресу: можна тягнути або клікнути */
 .rn-carousel__progress {
     position: relative;
     height: clamp(6px, 0.6vw, 12px);
@@ -169,21 +160,26 @@
     border-radius: 12px;
     background-color: #F3E1C6;
     box-shadow: var(--rn-shadow);
-    overflow: hidden;
+    cursor: pointer;
+    touch-action: none;
+}
+.rn-carousel__progress::before {
+    content: '';
+    position: absolute;
+    inset: -10px 0;
 }
 .rn-carousel__progress span {
     position: absolute;
     top: 0;
     height: 100%;
-    min-width: 14%;
     border-radius: 12px;
     background-color: var(--rn-orange);
-    transition: left 0.1s linear;
+    cursor: grab;
 }
+.rn-carousel__progress:active span { cursor: grabbing; }
 
 .rn-carousel--dark .rn-carousel__progress { background-color: var(--rn-cream); }
 
-/* ---------- Банер застосунку: у макеті 1760 × 370, радіуси 1000/1000/1000/0 ---------- */
 .rn-promo {
     display: grid;
     grid-template-columns: 1fr auto;
@@ -200,21 +196,37 @@
 .rn-promo__title { font-size: clamp(22px, 2vw, 38px); font-weight: 600; margin-bottom: 14px; }
 .rn-promo__desc { max-width: 720px; font-size: clamp(14px, 1.05vw, 20px); line-height: 1.5; }
 
-.rn-promo__qr {
-    padding: clamp(12px, 1vw, 20px);
+.rn-promo__logo {
+    display: grid;
+    place-items: center;
+    padding: clamp(14px, 1.2vw, 24px);
     border-radius: 23px;
-    background-color: #FFFFFF;
+    background-color: rgba(255, 255, 255, 0.55);
 }
-.rn-promo__qr img { display: block; width: clamp(96px, 8vw, 150px); height: auto; }
 
 .rn-promo__cta {
     grid-column: 1 / -1;
-    text-align: center;
+    justify-self: center;
+    color: var(--rn-green);
     font-size: clamp(13px, 0.95vw, 18px);
-    font-weight: 500;
+    font-weight: 600;
+    text-decoration: none;
 }
+.rn-promo__cta:hover { text-decoration: underline; }
 
-/* ---------- Адаптивність ---------- */
+/* ---------- Іконки й логотип ---------- */
+.rn-icon { display: inline-block; vertical-align: middle; flex-shrink: 0; }
+
+.cat-icon,
+.field-icon { color: #FA9B00; font-size: 22px; line-height: 0; }
+.search-icon,
+.cat-icon.is-dark { color: #34352F; font-size: 20px; line-height: 0; }
+
+.rn-tabs__tab .rn-icon { color: #FA9B00; }
+
+.logo-container,
+.footer-brand { display: inline-flex; align-items: center; gap: 10px; }
+
 @media (max-width: 1024px) {
     .rn-carousel__track { grid-auto-columns: calc((100% - 2 * var(--gap)) / 3); }
 }

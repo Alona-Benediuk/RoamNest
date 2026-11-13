@@ -1,7 +1,3 @@
-/* =========================================================
-   Панель фільтрів (за макетом Figma: ширина 573px)
-   ========================================================= */
-
 .rn-filters {
     --f-green: #26382E;
     --f-orange: #FF9800;
@@ -30,7 +26,7 @@
 }
 
 .rn-filters__group-title {
-    float: left;                      /* щоб legend поводився як звичайний заголовок */
+    float: left;
     width: 100%;
     margin-bottom: 8px;
     padding: 0 clamp(20px, 2vw, 40px);
@@ -49,14 +45,12 @@
 }
 .rn-filters__option:hover { background-color: rgba(255, 255, 255, 0.4); }
 
-/* Справжній чекбокс прихований, але доступний з клавіатури */
 .rn-filters__option input {
     position: absolute;
     opacity: 0;
     pointer-events: none;
 }
 
-/* Помаранчевий овальний «чекбокс», як у макеті */
 .rn-filters__check {
     flex: 0 0 auto;
     width: 12px;
@@ -74,7 +68,6 @@
     outline-offset: 2px;
 }
 
-/* Жовта смуга «Більше ⌄» на всю ширину */
 .rn-filters__more {
     clear: both;
     display: flex;
