@@ -11,51 +11,62 @@ const Home = () => {
         const loadProperties = async () => {
             try {
                 const data = await getProperties();
-
-                const items = Array.isArray(data)
-                    ? data
-                    : data.results || [];
-
+                const items = Array.isArray(data) ? data : data.results || [];
                 setProperties(items);
             } catch (err) {
-                console.error('Помилка завантаження:', err.response || err);
-                setError(
-                    err.response?.data?.detail ||
-                    'Не вдалося завантажити помешкання.'
-                );
+                setError('Не вдалося завантажити помешкання.');
             } finally {
                 setLoading(false);
             }
         };
-
         loadProperties();
     }, []);
 
+    if (loading) return <div className="loader">Завантаження...</div>;
+    if (error) return <div className="error-text">{error}</div>;
+
     return (
-        <div className="page-container">
-            <section>
-                <h1>Знайди своє ідеальне місце для відпочинку</h1>
-                <p>
-                    Відкривай нові місця та бронюй помешкання
-                    для незабутніх подорожей.
-                </p>
+        <div className="home-page-wrapper">
+            {/* Секция 1: Пляж */}
+            <section className="home-section">
+                <div className="section-top-bar">
+                    <div className="section-title-pill">Пляж</div>
+                    <div className="search-pills">
+                        <div className="search-pill">🔍 Місто</div>
+                        <div className="search-pill">🌴 Природа</div>
+                    </div>
+                </div>
+                <div className="properties-grid">
+                    {properties.slice(0, 4).map((property) => (
+                        <PropertyCard key={`beach-${property.id}`} property={property} />
+                    ))}
+                </div>
             </section>
 
-            <section>
-                <h2>Популярні помешкання</h2>
-                {loading && <p>Завантаження...</p>}
-                {error && <p>{error}</p>}
-                {!loading && !error && properties.length === 0 && (
-                    <p>Наразі немає доступних помешкань.</p>
-                )}
-                    <div className="properties-grid">
-                        {properties.map((property) => (
-                            <PropertyCard
-                                key={property.id}
-                                property={property}
-                            />
-                        ))}
-                    </div>
+            {/* Секция 2: Популярні */}
+            <section className="home-section">
+                <div className="section-header">
+                    <h2>Популярні</h2>
+                    <button className="btn-see-more">Дивитись далі</button>
+                </div>
+                <div className="properties-grid">
+                    {properties.slice(0, 4).map((property) => (
+                        <PropertyCard key={`pop-${property.id}`} property={property} />
+                    ))}
+                </div>
+            </section>
+
+            {/* Секция 3: Довгострокова оренда */}
+            <section className="home-section">
+                <div className="section-header">
+                    <h2>Довгострокова оренда</h2>
+                    <button className="btn-see-more">Дивитись далі</button>
+                </div>
+                <div className="properties-grid">
+                    {properties.slice(0, 4).map((property) => (
+                        <PropertyCard key={`long-${property.id}`} property={property} />
+                    ))}
+                </div>
             </section>
         </div>
     );

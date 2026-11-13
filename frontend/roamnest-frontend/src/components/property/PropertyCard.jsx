@@ -1,40 +1,35 @@
 import { Link } from 'react-router-dom';
 
 const PropertyCard = ({ property }) => {
-    const mainImage =
-        property.images?.find((image) => image.is_main)?.image_url ||
-        property.images?.[0]?.image_url ||
-        property.main_image ||
-        'https://placehold.co/600x400?text=No+photo';
+    // Используем данные с бэкенда, а если их нет - ставим заглушки как на макете
+    const price = property.price_per_night || 341;
+    const title = property.title || 'Lakefront Cabin: Private Beach...';
+    const location = property.city ? `${property.city}, ${property.country}` : 'Канада';
 
     return (
-        <article className="property-card">
-            <Link to={`/properties/${property.id}`} className="property-card-link">
-                <img
-                    src={mainImage}
-                    alt={property.title}
-                    className="property-image"
-                    onError={(e) => {
-                        e.currentTarget.src =
-                            'https://placehold.co/600x400?text=No+photo';
-                    }}
-                />
-                <div className="property-card-content">
-                    <h3>{property.title}</h3>
-                    <p className="property-location">
-                        {property.city}, {property.country}
-                    </p>
-                    <p className="property-description">
-                        {property.description}
-                    </p>
-                    {property.price_per_night != null && (
-                        <p className="property-price">
-                            {property.price_per_night} грн / ніч
-                        </p>
-                    )}
+        <div className="property-card-modern">
+            <Link to={`/properties/${property.id}`} className="card-link">
+                <div className="card-image-wrapper">
+                    <img 
+                        src={property.main_image || 'https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?q=80&w=600&auto=format&fit=crop'} 
+                        alt={title} 
+                        className="card-image"
+                    />
+                    <button className="card-heart-btn">♡</button>
                 </div>
+                
+                <div className="card-content">
+                    <h3 className="card-title">{title}</h3>
+                    <p className="card-location">{location}</p>
+                    <p className="card-features">8 rooms • 2 guests</p>
+                    
+                    <div className="card-price-tag">
+                        ${price}
+                    </div>
+                </div>
+                <div className="card-bottom-line"></div>
             </Link>
-        </article>
+        </div>
     );
 };
 

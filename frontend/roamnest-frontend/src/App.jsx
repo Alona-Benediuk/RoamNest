@@ -4,13 +4,14 @@ import ProtectedRoute from './components/common/ProtectedRoute';
 import Layout from './components/layout/Layout';
 
 import Home from './pages/Home';
+import Search from './pages/Search'; // <-- ДОБАВЛЕНО
 import Login from './pages/Login';
-import Register from './pages/Register'; // <-- Додано
+import Register from './pages/Register'; 
 import PropertyDetails from './pages/PropertyDetails';
 import Profile from './pages/Profile';
 import MyBookings from './pages/MyBookings';
 import OwnerDashboard from './pages/owner/OwnerDashboard';
-import OwnerBookings from './pages/owner/OwnerBookings'; // <-- Додано
+import OwnerBookings from './pages/owner/OwnerBookings'; 
 import AdminUsers from './pages/admin/AdminUsers';
 import AdminProperties from './pages/admin/AdminProperties';
 
@@ -19,13 +20,16 @@ function App() {
         <AuthProvider>
             <BrowserRouter>
                 <Routes>
+                    {/* Публичные маршруты (доступны всем) */}
                     <Route element={<Layout />}>
                         <Route path="/" element={<Home />} />
+                        <Route path="/search" element={<Search />} /> {/* <-- ДОБАВЛЕНО МАРШРУТ */}
                         <Route path="/properties/:id" element={<PropertyDetails />} />
                         <Route path="/login" element={<Login />} />
-                        <Route path="/register" element={<Register />} /> {/* <-- Додано */}
+                        <Route path="/register" element={<Register />} /> 
                     </Route>
 
+                    {/* Защищенные маршруты (USER, OWNER, ADMIN) */}
                     <Route element={<ProtectedRoute allowedRoles={['USER', 'OWNER', 'ADMIN']} />}>
                         <Route element={<Layout />}>
                             <Route path="/profile" element={<Profile />} />
@@ -33,13 +37,15 @@ function App() {
                         </Route>
                     </Route>
 
+                    {/* Маршруты только для OWNER */}
                     <Route element={<ProtectedRoute allowedRoles={['OWNER']} />}>
                         <Route element={<Layout />}>
                             <Route path="/owner/dashboard" element={<OwnerDashboard />} />
-                            <Route path="/owner/bookings" element={<OwnerBookings />} /> {/* <-- Додано */}
+                            <Route path="/owner/bookings" element={<OwnerBookings />} /> 
                         </Route>
                     </Route>
 
+                    {/* Маршруты только для ADMIN */}
                     <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />}>
                         <Route element={<Layout />}>
                             <Route path="/admin/users" element={<AdminUsers />} />
@@ -47,6 +53,7 @@ function App() {
                         </Route>
                     </Route>
 
+                    {/* Редирект для несуществующих путей */}
                     <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>
             </BrowserRouter>
