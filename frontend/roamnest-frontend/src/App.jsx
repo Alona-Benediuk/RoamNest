@@ -13,6 +13,7 @@ import Profile from './pages/Profile';
 import MyBookings from './pages/MyBookings';
 import OwnerDashboard from './pages/owner/OwnerDashboard';
 import OwnerBookings from './pages/owner/OwnerBookings'; 
+import OwnerPropertyDetails from './pages/owner/OwnerPropertyDetails';
 import AdminUsers from './pages/admin/AdminUsers';
 import AdminProperties from './pages/admin/AdminProperties';
 
@@ -44,6 +45,10 @@ function App() {
                         <Route element={<Layout />}>
                             <Route path="/owner/dashboard" element={<OwnerDashboard />} />
                             <Route path="/owner/bookings" element={<OwnerBookings />} /> 
+                            
+                            {/* ВАЖНО: маршрут "new" должен идти ПЕРЕД маршрутом ":id" */}
+                            <Route path="/owner/properties/new" element={<OwnerPropertyDetails />} />
+                            <Route path="/owner/properties/:id" element={<OwnerPropertyDetails />} />
                         </Route>
                     </Route>
 

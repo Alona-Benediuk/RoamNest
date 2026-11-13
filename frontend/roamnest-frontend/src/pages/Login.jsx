@@ -1,54 +1,71 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 
 const Login = () => {
-    const [role, setRole] = useState('USER');
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [error, setError] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+    
     const { login } = useAuth();
     const navigate = useNavigate();
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        login({ id: 1, username: 'User', role: role });
-        navigate('/');
+        setError('');
+        setIsLoading(true);
+
+        try {
+            await login(email, password);
+            navigate('/');
+        } catch (err) {
+            console.error(err);
+            setError('Невірний email або пароль');
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
         <div className="auth-page-bg">
             <div className="auth-container">
-                <button className="btn-back" onClick={() => navigate(-1)}>
-                    ↩ Назад
-                </button>
-
-                <div className="auth-bg-logo">
-                    <svg width="160" height="160" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M50 10L15 40V65H85V40L50 10Z" fill="#F3C770" />
-                        <rect x="75" y="20" width="8" height="15" rx="2" fill="#F3C770" />
-                        <rect x="40" y="40" width="8" height="8" rx="1" fill="#2d312a" />
-                        <rect x="52" y="40" width="8" height="8" rx="1" fill="#2d312a" />
-                        <rect x="40" y="52" width="8" height="8" rx="1" fill="#2d312a" />
-                        <rect x="52" y="52" width="8" height="8" rx="1" fill="#2d312a" />
-                        <path d="M15 70C25 80 75 80 85 70C85 85 70 95 50 95C30 95 15 85 15 70Z" fill="#F3C770" />
-                        <path d="M15 75C35 85 65 85 85 75" stroke="#2d312a" strokeWidth="3" strokeLinecap="round" />
-                    </svg>
-                </div>
+                <button className="btn-back" onClick={() => navigate(-1)}>↩ Назад</button>
 
                 <div className="auth-step-form">
-                    <h2 className="auth-title" style={{ textAlign: 'center', marginBottom: '30px' }}>Увійти як</h2>
+                    <h2 className="auth-title" style={{ textAlign: 'center', marginBottom: '30px' }}>Увійти</h2>
                     
-                    <div className="role-tabs">
-                        <button className={`role-tab ${role === 'OWNER' ? 'active' : ''}`} onClick={() => setRole('OWNER')}>Власник</button>
-                        <button className={`role-tab ${role === 'USER' ? 'active' : ''}`} onClick={() => setRole('USER')}>Гість</button>
-                    </div>
+                    {error && <p style={{ color: 'red', textAlign: 'center', marginBottom: '15px' }}>{error}</p>}
 
                     <form onSubmit={handleSubmit} className="auth-form-modern">
                         <div className="input-group">
-                            <span className="input-label">Пароль</span>
-                            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+                            <span className="input-label">Email</span>
+                            <input 
+                                type="email" 
+                                value={email} 
+                                onChange={(e) => setEmail(e.target.value)} 
+                                required 
+                                placeholder="example@gmail.com"
+                            />
                         </div>
-                        <button type="submit" className="btn-main-action">Далі</button>
+                        <div className="input-group">
+                            <span className="input-label">Пароль</span>
+                            <input 
+                                type="password" 
+                                value={password} 
+                                onChange={(e) => setPassword(e.target.value)} 
+                                required 
+                                placeholder="********"
+                            />
+                        </div>
+                        <button type="submit" className="btn-main-action" disabled={isLoading}>
+                            {isLoading ? 'Завантаження...' : 'Далі'}
+                        </button>
                     </form>
+
+                    <div style={{ textAlign: 'center', marginTop: '20px', color: '#fff' }}>
+                        Немає акаунту? <Link to="/register" style={{ color: '#F5C770', fontWeight: 'bold' }}>Зареєструватися</Link>
+                    </div>
                 </div>
             </div>
         </div>
