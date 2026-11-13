@@ -1,6 +1,23 @@
-
+﻿
 from django.conf import settings
 from django.db import models
+
+
+class Category(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    slug = models.SlugField(max_length=100, unique=True)
+    description = models.TextField(blank=True)
+    image_url = models.URLField(max_length=500, blank=True)
+    sort_order = models.PositiveIntegerField(default=0)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ["sort_order", "name"]
+        verbose_name = "Category"
+        verbose_name_plural = "Categories"
+
+    def __str__(self):
+        return self.name
 
 
 class Property(models.Model):
@@ -20,6 +37,12 @@ class Property(models.Model):
 
     amenities = models.ManyToManyField(
         "Amenity",
+        blank=True,
+        related_name="properties",
+    )
+
+    categories = models.ManyToManyField(
+        "Category",
         blank=True,
         related_name="properties",
     )
@@ -48,6 +71,29 @@ class Property(models.Model):
 
     def __str__(self):
         return f"{self.title} - {self.city}"
+
+
+class PropertyCollection(models.Model):
+    name = models.CharField(max_length=100)
+    slug = models.SlugField(max_length=100, unique=True)
+    description = models.TextField(blank=True)
+    image_url = models.URLField(max_length=500, blank=True)
+    sort_order = models.PositiveIntegerField(default=0)
+    is_active = models.BooleanField(default=True)
+
+    properties = models.ManyToManyField(
+        Property,
+        blank=True,
+        related_name="collections",
+    )
+
+    class Meta:
+        ordering = ["sort_order", "name"]
+        verbose_name = "Property collection"
+        verbose_name_plural = "Property collections"
+
+    def __str__(self):
+        return self.name
 
 
 class Amenity(models.Model):
@@ -102,6 +148,11 @@ class PropertyImage(models.Model):
         blank=True,
     )
     image_url = models.URLField(max_length=500)
+    image_key = models.CharField(
+        max_length=500,
+        blank=True,
+        default="",
+    )
     is_main = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 

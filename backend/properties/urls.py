@@ -13,7 +13,7 @@ from .views import (
 urlpatterns = [
     path("", PropertyListAPIView.as_view(), name="property-list"),
 
-    # Фотографії об'єкта
+    # Р¤РѕС‚РѕРіСЂР°С„С–С— РѕР±'С”РєС‚Р°
     path(
         "<int:pk>/images/",
         PropertyImageListCreateAPIView.as_view(),
@@ -25,21 +25,21 @@ urlpatterns = [
         name="property-image-delete",
     ),
 
-    # Кімнати об'єкта
+    # РљС–РјРЅР°С‚Рё РѕР±'С”РєС‚Р°
     path(
         "<int:pk>/rooms/",
         PropertyRentalUnitListCreateAPIView.as_view(),
         name="property-room-list-create",
     ),
 
-    # Деталі об'єкта
+    # Р”РµС‚Р°Р»С– РѕР±'С”РєС‚Р°
     path(
         "<int:pk>/",
         PropertyDetailAPIView.as_view(),
         name="property-detail",
     ),
 
-    # Окрема кімната
+    # РћРєСЂРµРјР° РєС–РјРЅР°С‚Р°
     path(
         "rooms/<int:pk>/",
         RentalUnitDetailAPIView.as_view(),

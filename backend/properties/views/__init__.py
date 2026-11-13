@@ -7,6 +7,10 @@ from .property_views import (
 
 from .amenity_views import AmenityListAPIView
 
+from .category_views import CategoryListAPIView
+
+from .collection_views import PropertyCollectionListAPIView
+
 from .image_views import (
     PropertyImageListCreateAPIView,
     PropertyImageDeleteAPIView,
