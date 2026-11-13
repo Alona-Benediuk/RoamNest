@@ -23,6 +23,7 @@ const Header = () => {
     const navigate = useNavigate();
     const location = useLocation();
 
+    // Показываем большой блок с поиском только на главной странице
     const isHomePage = location.pathname === '/';
 
     const handleLogout = () => {
@@ -34,7 +35,6 @@ const Header = () => {
         <header className="header-wrapper">
             {/* 1. Верхняя панель навигации */}
             <div className="top-nav">
-                {/* ВОТ ОН - КОНТЕЙНЕР, который выравнивает контент по краям */}
                 <div className="container header-container">
                     <div className="nav-left">
                         <Link to="/" style={{ textDecoration: 'none' }}>
@@ -44,7 +44,10 @@ const Header = () => {
                         <div className="breadcrumbs">
                             <Link to="/">Головна</Link>
                             <span className="separator">\</span>
-                            <Link to="/">Варіанти проживання</Link>
+                            
+                            {/* ВОТ ЗДЕСЬ ИЗМЕНЕНА ССЫЛКА НА /search */}
+                            <Link to="/search">Варіанти проживання</Link>
+                            
                             <span className="separator">\</span>
                             <span className="current">Lakefront Cabin: Private Beach...</span>
                             <span className="separator">\</span>
@@ -73,13 +76,12 @@ const Header = () => {
                 </div>
             </div>
 
-            {/* 2. Главный экран (только для Home) */}
+            {/* 2. Главный экран (показывается ТОЛЬКО на главной странице) */}
             {isHomePage && (
                 <section className="hero-section">
                     <div className="hero-bg-image"></div>
                     <div className="hero-overlay"></div>
                     
-                    {/* Тот же класс container для выравнивания */}
                     <div className="hero-content container">
                         <h1 className="hero-title">RoamNest</h1>
                         <h2 className="hero-subtitle">
@@ -87,7 +89,6 @@ const Header = () => {
                             у будь-якій подорожі
                         </h2>
 
-                        {/* ... блок поиска без изменений ... */}
                         <div className="search-container">
                             <div className="search-box">
                                 <div className="search-row-top">
@@ -137,7 +138,10 @@ const Header = () => {
                                 </div>
                             </div>
                             
-                            <button className="main-search-btn">Пошук</button>
+                            {/* Кнопка пошуку, которая ведет на страницу результатов */}
+                            <Link to="/search" className="main-search-btn" style={{ display: 'inline-block', textAlign: 'center', textDecoration: 'none', color: '#000' }}>
+                                Пошук
+                            </Link>
                         </div>
                     </div>
                 </section>
