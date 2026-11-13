@@ -10,14 +10,11 @@ export const AuthProvider = ({ children }) => {
     useEffect(() => {
         const initAuth = async () => {
             const token = localStorage.getItem('access_token');
-            
             if (token) {
                 try {
-                    // Проверяем токен на бэкенде
                     const userData = await authApi.getMe();
                     setUser(userData);
                 } catch (error) {
-                    // Если токен протух или неверный - выкидываем
                     localStorage.removeItem('access_token');
                     localStorage.removeItem('refresh_token');
                     setUser(null);
@@ -25,28 +22,21 @@ export const AuthProvider = ({ children }) => {
             }
             setLoading(false);
         };
-
         initAuth();
     }, []);
 
     const login = async (email, password) => {
-        // Делаем реальный запрос к Django
         const data = await authApi.login(email, password);
-        
-        // Сохраняем реальные токены
         localStorage.setItem('access_token', data.access);
         localStorage.setItem('refresh_token', data.refresh);
-        
-        // Запрашиваем профиль, чтобы узнать роль
+        // После входа сразу запрашиваем профиль, чтобы получить роль
         const userData = await authApi.getMe();
         setUser(userData);
         return userData;
     };
 
-    const logout = () => {
-        try {
-            authApi.logout(); // Говорим бэкенду разлогиниться
-        } catch(e) {}
+    const logout = async () => {
+        try { await authApi.logout(); } catch (e) {}
         localStorage.removeItem('access_token');
         localStorage.removeItem('refresh_token');
         setUser(null);

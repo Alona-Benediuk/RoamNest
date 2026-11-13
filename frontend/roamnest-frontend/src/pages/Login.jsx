@@ -18,7 +18,7 @@ const Login = () => {
 
         try {
             await login(email, password);
-            navigate('/'); // Успешный вход -> на главную
+            navigate('/');
         } catch (err) {
             console.error(err);
             setError('Невірний email або пароль');

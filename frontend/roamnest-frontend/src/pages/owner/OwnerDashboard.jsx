@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { getProfile } from '../../api/profile';
 import { getOwnerProperties, getOwnerBookings } from '../../api/owner';
@@ -18,18 +18,15 @@ const OwnerDashboard = () => {
             if (!user) return;
             
             try {
-                // Загружаем все данные параллельно
-                const [profileData, propertiesData, bookingsData] = await Promise.all([
-                    getProfile(),
-                    getOwnerProperties(user.id),
-                    getOwnerBookings(user.id)
-                ]);
+                const profileData = await getProfile();
+                const propertiesData = await getOwnerProperties(user.id);
+                const bookingsData = await getOwnerBookings(user.id);
                 
                 setProfile(profileData);
                 setProperties(Array.isArray(propertiesData) ? propertiesData : propertiesData.results || []);
                 setBookings(Array.isArray(bookingsData) ? bookingsData : bookingsData.results || []);
             } catch (err) {
-                console.error('Помилка завантаження даних кабінету власника:', err);
+                console.error('Помилка завантаження:', err);
                 if (err.response?.status === 401) {
                     logout();
                     navigate('/login');
@@ -113,16 +110,25 @@ const OwnerDashboard = () => {
                             <span className="info-label">Номер</span>
                             <span className="info-value">**** **** 4725</span>
                         </div>
-                        <button className="btn-outline" style={{ marginTop: '10px' }}>Відв'язати карту</button>
+                        <button className="btn-outline" style={{ marginTop: '15px' }}>Відв'язати карту</button>
                     </div>
 
-                    <div className="profile-actions" style={{ borderTop: 'none', paddingTop: 0 }}>
+                    {/* Блок с кнопками */}
+                    <div className="profile-actions">
                         <button className="btn-outline">Календар</button>
                         <button className="btn-outline">Аналітика та фінанси</button>
-                        <button className="btn-outline">Створити гніздечко</button>
+                        
+                        {/* ССЫЛКА НА СОЗДАНИЕ */}
+                        <Link 
+                            to="/owner/properties/new" 
+                            className="btn-primary-action" 
+                            style={{ textDecoration: 'none', textAlign: 'center', display: 'block' }}
+                        >
+                            Створити гніздечко
+                        </Link>
                     </div>
 
-                    <div style={{ position: 'absolute', bottom: '20px', left: '20px', right: '20px' }}>
+                    <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
                         <button className="btn-outline" onClick={handleLogout}>Вихід</button>
                     </div>
                 </aside>
@@ -130,22 +136,7 @@ const OwnerDashboard = () => {
                 {/* ПРАВАЯ КОЛОНКА (Контент) */}
                 <main className="profile-main">
                     
-                    {/* Блок Чату */}
-                    <div className="profile-card">
-                        <h2 className="card-title">Чат <span className="info-icon">ⓘ</span></h2>
-                        <div className="chat-preview">
-                            <div className="chat-avatar">
-                                <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=100&auto=format&fit=crop" alt="Chat" />
-                            </div>
-                            <div className="chat-bubble">
-                                <p className="chat-author">Сергій (Lakefront Cabin: Private Beach, Kayaks)</p>
-                                <p className="chat-text">Добрий день, чи можна змінити дати заїзду на наступний тиждень?</p>
-                                <p className="chat-time">14:30</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Мої об'єкти */}
+                    {/* Мої об'єкти (Из БД) */}
                     <div className="profile-card">
                         <div className="card-header-orange">
                             <h2 className="card-title-text">Мої об'єкти</h2>
@@ -161,17 +152,21 @@ const OwnerDashboard = () => {
                                         <p>📍 {property.city}, {property.country}</p>
                                         <p>{property.address}</p>
                                     </div>
-                                    <button className="btn-edit-property" onClick={() => alert('Редагування в розробці')}>
+                                    <Link 
+                                        to={`/owner/properties/${property.id}`} 
+                                        className="btn-edit-property" 
+                                        style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                                    >
                                         Редагувати
-                                    </button>
+                                    </Link>
                                 </div>
                             ))
                         ) : (
-                            <p style={{ padding: '20px', color: '#666' }}>У вас поки немає об'єктів.</p>
+                            <p style={{ padding: '20px', color: '#666' }}>У вас поки немає об'єктів. Натисніть "Створити гніздечко", щоб додати.</p>
                         )}
                     </div>
 
-                    {/* Календар */}
+                    {/* Календар (Из БД) */}
                     <div className="profile-card">
                         <div className="card-header-orange">
                             <h2 className="card-title-text">Календар</h2>
@@ -179,7 +174,6 @@ const OwnerDashboard = () => {
                         </div>
                         
                         <div className="owner-calendar-layout">
-                            {/* Сетка календаря (Визуальная) */}
                             <div className="calendar-grid-wrapper">
                                 <div className="calendar-header">
                                     <button className="btn-cal-nav">2026</button>
@@ -196,7 +190,6 @@ const OwnerDashboard = () => {
                                 </div>
                             </div>
 
-                            {/* Список подій (Бронирования из БД) */}
                             <div className="calendar-events-list">
                                 <div className="calendar-search">
                                     <input type="text" placeholder="🔍 Пошук" />
@@ -205,17 +198,16 @@ const OwnerDashboard = () => {
                                     {bookings.length > 0 ? (
                                         bookings.map((booking, idx) => (
                                             <div key={booking.id} className={`calendar-event-item event-color-${idx % 3}`}>
-                                                <div className="event-title">{booking.room_title || `Бронь #${booking.id}`}</div>
+                                                <div className="event-title">{booking.guest_name || `Бронь #${booking.id}`}</div>
                                                 <div className="event-dates">{booking.check_in} - {booking.check_out}</div>
                                             </div>
                                         ))
                                     ) : (
-                                        <p style={{ color: '#888', fontSize: '13px' }}>Немає бронювань</p>
+                                        <p style={{ color: '#888', fontSize: '13px' }}>Немає нових бронювань</p>
                                     )}
                                 </div>
                             </div>
                         </div>
-
                     </div>
 
                 </main>

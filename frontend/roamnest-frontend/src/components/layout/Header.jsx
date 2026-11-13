@@ -26,6 +26,9 @@ const Header = () => {
     // Показываем большой блок с поиском только на главной странице
     const isHomePage = location.pathname === '/';
 
+    // Определяем, куда вести пользователя в зависимости от роли
+    const cabinetLink = user?.role === 'OWNER' ? '/owner/dashboard' : '/profile';
+
     const handleLogout = () => {
         logout();
         navigate('/');
@@ -45,13 +48,14 @@ const Header = () => {
                             <Link to="/">Головна</Link>
                             <span className="separator">\</span>
                             
-                            {/* ВОТ ЗДЕСЬ ИЗМЕНЕНА ССЫЛКА НА /search */}
                             <Link to="/search">Варіанти проживання</Link>
                             
                             <span className="separator">\</span>
                             <span className="current">Lakefront Cabin: Private Beach...</span>
                             <span className="separator">\</span>
-                            <Link to="/profile">Кабінет</Link>
+                            
+                            {/* Ссылка "Кабінет" теперь ведет в зависимости от роли */}
+                            <Link to={cabinetLink}>Кабінет</Link>
                         </div>
                     </div>
 
@@ -64,7 +68,11 @@ const Header = () => {
                         {user ? (
                             <>
                                 <button onClick={handleLogout} className="nav-btn">Вийти</button>
-                                <div className="avatar-circle"></div>
+                                
+                                {/* Аватарка теперь тоже кликабельная и ведет в кабинет */}
+                                <Link to={cabinetLink}>
+                                    <div className="avatar-circle"></div>
+                                </Link>
                             </>
                         ) : (
                             <>
@@ -138,7 +146,6 @@ const Header = () => {
                                 </div>
                             </div>
                             
-                            {/* Кнопка пошуку, которая ведет на страницу результатов */}
                             <Link to="/search" className="main-search-btn" style={{ display: 'inline-block', textAlign: 'center', textDecoration: 'none', color: '#000' }}>
                                 Пошук
                             </Link>
