@@ -5,7 +5,6 @@ import AppPromo from '../components/home/AppPromo';
 import { DEMO_PROPERTIES } from '../data/demoProperties';
 import './Home.css';
 
-// Вкладки верхньої секції. slug збігається з категоріями на бекенді (/api/categories/)
 const CATEGORY_TABS = [
     { slug: 'beach', label: 'Пляж', icon: '⛱️' },
     { slug: 'city', label: 'Місто', icon: '🏙️' },
@@ -29,10 +28,8 @@ const Home = () => {
             try {
                 const data = await getProperties();
                 const items = Array.isArray(data) ? data : data.results || [];
-                // Якщо в базі ще немає об'єктів — показуємо демо-картки
                 setProperties(items.length ? items : DEMO_PROPERTIES);
             } catch {
-                // Бекенд недоступний — показуємо демо-картки, щоб сторінка не була порожньою
                 setProperties(DEMO_PROPERTIES);
             } finally {
                 setLoading(false);
@@ -41,7 +38,6 @@ const Home = () => {
         loadProperties();
     }, []);
 
-    // Об'єкти активної вкладки; якщо в категорії порожньо — показуємо всі
     const tabProperties = useMemo(() => {
         const filtered = properties.filter((p) =>
             (p.categories || []).some((c) => c.slug === activeTab)

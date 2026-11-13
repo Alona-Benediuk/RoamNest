@@ -4,10 +4,6 @@ import './PropertyListItem.css';
 
 const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?q=80&w=800&auto=format&fit=crop';
 
-/*
- * Дані для рядка списку з об'єкта API (GET /api/properties/).
- * Ціна, гості та ліжка зберігаються в кімнатах (rental_units).
- */
 const toListData = (property) => {
     const units = property.rental_units || [];
     const prices = units.map((u) => Number(u.price_per_night)).filter(Boolean);
@@ -21,14 +17,13 @@ const toListData = (property) => {
         guests: units.length ? Math.max(...units.map((u) => u.max_guests || 0)) : null,
         beds: units.length ? Math.max(...units.map((u) => u.beds || 0)) : null,
         image: mainImage?.image_url || property.main_image || FALLBACK_IMAGE,
-        imagePosition: property.image_position || 'center', // яку частину фото показати
+        imagePosition: property.image_position || 'center',
         amenities: (property.amenities || []).slice(0, 3),
         rating: property.rating,
         reviews: property.reviews_count,
     };
 };
 
-// Іконки зручностей у темно-синіх кружечках (як у макеті)
 const AMENITY_ICONS = [
     { match: /wi-?fi|інтернет/i, path: 'M2 9a15 15 0 0 1 20 0M5 12.5a10 10 0 0 1 14 0M8.5 16a5 5 0 0 1 7 0M12 19.5h.01' },
     { match: /парк/i, path: 'M8 20V4h5a4 4 0 0 1 0 8H8' },
@@ -49,10 +44,6 @@ const HeartIcon = ({ filled }) => (
     </svg>
 );
 
-/**
- * Рядок у списку «Варіанти проживання» (за макетом Figma: 1167 × 255, радіус 50px).
- * nights — кількість ночей для підрахунку загальної суми (з пошуку дат).
- */
 const PropertyListItem = ({ property, nights = 7 }) => {
     const [isFavorite, setIsFavorite] = useState(false);
     const item = toListData(property);

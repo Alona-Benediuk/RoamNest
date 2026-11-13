@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import './FiltersSidebar.css';
 
-// Групи фільтрів за макетом Figma. Перші 4 пункти видно одразу, решту — після «Більше».
 const FILTER_GROUPS = [
     {
         id: 'type',
@@ -32,10 +31,6 @@ const FILTER_GROUPS = [
 
 const VISIBLE_COUNT = 4;
 
-/**
- * Панель фільтрів (ТЗ п. 4.2).
- * selected — обрані значення { type: ['Готелі'], ... }, onChange — зміна вибору.
- */
 const FiltersSidebar = ({ selected = {}, onChange = () => {} }) => {
     const [expanded, setExpanded] = useState({});
 

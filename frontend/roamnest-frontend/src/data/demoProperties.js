@@ -1,13 +1,3 @@
-/*
- * Демо-дані для головної сторінки та сторінки «Варіанти проживання».
- * Використовуються лише тоді, коли бекенд недоступний або ще не має об'єктів,
- * щоб верстку можна було перевіряти без запущеного сервера.
- * Структура повторює відповідь GET /api/properties/ (див. backend/API_CONTRACTS.md).
- * rating, reviews_count та image_position бекенд поки не віддає — це поля для демо.
- *
- * Фото — з макета Figma, лежать у src/assets/photos.
- * image_position — яку частину фото показувати в рамці (як object-position у CSS).
- */
 import poolside from '../assets/photos/poolside.jpg';
 import oceanTerrace from '../assets/photos/ocean-terrace.jpg';
 import palmTerrace from '../assets/hero.jpg';

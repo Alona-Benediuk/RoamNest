@@ -1,10 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import PropertyCard from '../property/PropertyCard';
 
-/**
- * Горизонтальна стрічка карток зі смугою прогресу прокрутки
- * (помаранчева лінія під секцією в макеті).
- */
 const PropertyCarousel = ({ properties, variant = 'default', dark = false }) => {
     const trackRef = useRef(null);
     const [progress, setProgress] = useState({ size: 100, offset: 0 });

@@ -1,6 +1,3 @@
-/**
- * Банер «Твій RoamNest завжди під рукою» з QR-кодом мобільного застосунку.
- */
 const AppPromo = () => (
     <section className="rn-promo" aria-labelledby="rn-promo-title">
         <div className="rn-promo__text">
@@ -12,7 +9,6 @@ const AppPromo = () => (
         </div>
 
         <div className="rn-promo__qr">
-            {/* Якщо файлу public/app-qr.svg немає, блок з QR просто ховається */}
             <img
                 src="/app-qr.svg"
                 alt="QR-код RoamNest"

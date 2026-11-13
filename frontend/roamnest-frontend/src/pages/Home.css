@@ -1,22 +1,10 @@
-/* =========================================================
-   Головна сторінка — секції під банером (за макетом Figma)
-   Макет зроблено під ширину екрана 1920px, контент — 1760px.
-   Кольори з макета:
-     accent  #26382E (темно-зелений)
-     main    #FCC05F (жовтий)
-     фон     #FFF6EC, картка #FFE5B6, ціна #FF9800
-   ========================================================= */
-
-/* Фото банера з макета (файл src/assets/hero.jpg).
-   Шлях відносний: Vite сам підключає файл і покаже помилку, якщо його немає */
 .hero-bg-image {
     background-image: url('../assets/hero.jpg') !important;
     background-size: cover !important;
-    background-position: center 60% !important;     /* у кадрі пальми й море */
-    opacity: 0.89;                                   /* у макеті: прозорість фото 89% */
+    background-position: center 60% !important;
+    opacity: 0.89;
 }
 
-/* Затемнення фото банера як у макеті: #403931, 50% */
 .hero-overlay {
     background-color: rgba(64, 57, 49, 0.5) !important;
 }
@@ -35,7 +23,6 @@
     background-color: var(--rn-cream);
 }
 
-/* М'які жовті «плями» на фоні */
 .rn-home::before,
 .rn-home::after {
     content: '';
@@ -75,7 +62,6 @@
     margin-bottom: 24px;
 }
 
-/* Темно-зелена «вкладка»: у макеті 423 × 76, радіус 200/200/0/200 */
 .rn-section__title {
     min-width: clamp(200px, 22vw, 423px);
     padding: clamp(12px, 1.25vw, 24px) clamp(20px, 1.9vw, 36px);
@@ -87,7 +73,6 @@
     line-height: 1.1;
 }
 
-/* «Дивитись далі»: у макеті 277 × 52, радіус 73, рамка 2px */
 .rn-section__more {
     min-width: clamp(140px, 14.4vw, 277px);
     padding: clamp(8px, 0.7vw, 13px) clamp(16px, 1.9vw, 36px);
@@ -128,7 +113,6 @@
 }
 .rn-tabs__tab:hover { background-color: var(--rn-peach); }
 
-/* Активна вкладка «зливається» з темно-зеленою панеллю */
 .rn-tabs__tab.is-active {
     margin-bottom: 0;
     padding: clamp(12px, 1vw, 20px) clamp(28px, 3vw, 56px);
@@ -183,7 +167,6 @@
 
 .rn-carousel--dark .rn-carousel__progress { background-color: var(--rn-cream); }
 
-/* ---------- Банер застосунку: у макеті 1760 × 370, радіуси 1000/1000/1000/0 ---------- */
 .rn-promo {
     display: grid;
     grid-template-columns: 1fr auto;
@@ -214,7 +197,6 @@
     font-weight: 500;
 }
 
-/* ---------- Адаптивність ---------- */
 @media (max-width: 1024px) {
     .rn-carousel__track { grid-auto-columns: calc((100% - 2 * var(--gap)) / 3); }
 }

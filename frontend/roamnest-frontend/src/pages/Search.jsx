@@ -9,7 +9,6 @@ import './Search.css';
 
 const PAGE_SIZE = 5;
 
-// Відповідність фільтрів «Тип розміщення» типам житла на бекенді (property_type)
 const TYPE_MAP = {
     'Готелі': ['HOTEL'],
     'Апартаменти': ['APARTMENT', 'ROOM'],
@@ -17,7 +16,6 @@ const TYPE_MAP = {
     'Будинки': ['HOUSE', 'VILLA'],
 };
 
-// «Тип місцевості» → категорії (/api/categories/)
 const AREA_MAP = {
     'Пляж': 'beach',
     'У центрі міста': 'city',
@@ -29,8 +27,6 @@ const AREA_MAP = {
 const hasAmenity = (property, name) =>
     (property.amenities || []).some((a) => a.name.toLowerCase() === name.toLowerCase());
 
-/* Фільтрація на клієнті: працює і з демо-даними, і з даними API.
-   Пізніше частину фільтрів можна передавати на бекенд (property_type, amenities, category). */
 const applyFilters = (items, f) => items.filter((p) => {
     if (f.type?.length) {
         const types = f.type.flatMap((t) => TYPE_MAP[t] || []);
@@ -67,7 +63,6 @@ const Search = () => {
             try {
                 const data = await getProperties();
                 const items = Array.isArray(data) ? data : data.results || [];
-                // Якщо в базі ще немає об'єктів — показуємо демо-дані
                 setProperties(items.length ? items : DEMO_PROPERTIES);
             } catch {
                 setProperties(DEMO_PROPERTIES);
@@ -84,7 +79,7 @@ const Search = () => {
 
     const handleFiltersChange = (next) => {
         setFilters(next);
-        setPage(0); // після зміни фільтрів повертаємось на першу сторінку
+        setPage(0);
     };
 
     const goToPage = (index) => {
@@ -95,8 +90,6 @@ const Search = () => {
     return (
         <div className="rn-search">
             <div className="rn-search__inner">
-
-                {/* Панель пошуку */}
                 <div className="rn-search-bar">
                     <label className="rn-search-bar__input">
                         <span aria-hidden="true">🔍</span>
@@ -107,7 +100,6 @@ const Search = () => {
                     <SearchField icon="👥" label="Кількість" value="2 особи" />
                 </div>
 
-                {/* «Назад» і кількість результатів */}
                 <div className="rn-search__toolbar">
                     <button type="button" className="rn-search__back" onClick={() => navigate(-1)}>
                         <span aria-hidden="true">↩</span> Назад
@@ -118,7 +110,6 @@ const Search = () => {
                 </div>
 
                 <div className="rn-search__layout">
-                    {/* Список житла */}
                     <section className="rn-search__results" aria-label="Результати пошуку">
                         {loading && <div className="loader">Завантаження...</div>}
 
@@ -147,7 +138,6 @@ const Search = () => {
                         )}
                     </section>
 
-                    {/* Карта і фільтри */}
                     <div className="rn-search__sidebar">
                         <SearchMap />
                         <FiltersSidebar selected={filters} onChange={handleFiltersChange} />
