@@ -1333,3 +1333,576 @@ button { cursor: pointer; border: none; font-family: inherit; }
 }
 
 
+/* =========================================
+    PROPERTY DETAILS PAGE (КАРТОЧКА ЖИТЛА)
+   ========================================= */
+.property-details-page {
+    background-color: #F8F5EE; /* Кремовый фон */
+    min-height: 100vh;
+    padding-bottom: 60px;
+}
+
+/* Верхнее фоновое изображение */
+.pd-hero {
+    width: 100%;
+    height: 400px;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    background-color: #e0e0e0; /* Заглушка, если нет картинки */
+}
+
+.pd-hero-overlay {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0) 40%);
+}
+
+.pd-hero-container {
+    position: relative;
+    z-index: 2;
+    padding-top: 100px; /* Отступ, чтобы не залезало под хедер */
+}
+
+/* Кнопка Назад */
+.btn-back-pill-white {
+    background-color: #F6EAD4;
+    color: #000;
+    padding: 10px 24px;
+    border-radius: 50px;
+    font-size: 14px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    transition: transform 0.2s;
+}
+.btn-back-pill-white:hover { transform: scale(1.05); }
+
+/* Основной контент */
+.pd-main-content {
+    margin-top: -30px; /* Наложение контента на картинку */
+    position: relative;
+    z-index: 5;
+}
+
+.pd-header {
+    background: #F8F5EE; /* Закрываем фон под заголовком */
+    padding: 20px;
+    border-radius: 20px 20px 0 0;
+}
+
+.pd-title {
+    font-size: 32px;
+    font-weight: 800;
+    color: #2d312a;
+    margin-bottom: 8px;
+}
+
+.pd-address {
+    font-size: 15px;
+    color: #666;
+}
+
+/* Плашки с удобствами */
+.pd-amenities-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 0 20px 20px 20px;
+}
+
+.pd-amenity-pill {
+    background: #fff;
+    border: 1px solid #E5DEC9;
+    padding: 8px 16px;
+    border-radius: 50px;
+    font-size: 13px;
+    color: #333;
+    font-weight: 500;
+}
+
+/* Сетка (Две колонки) */
+.pd-layout {
+    display: flex;
+    gap: 30px;
+    padding: 0 20px;
+}
+
+.pd-left-col { flex: 1; min-width: 0; /* Чтобы галерея не ломала верстку */ }
+.pd-right-col { width: 380px; flex-shrink: 0; align-self: flex-start;}
+
+/* Галерея */
+.pd-gallery {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 10px;
+    height: 350px;
+    margin-bottom: 30px;
+}
+
+.pd-gallery img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 12px;
+    background-color: #e0e0e0;
+}
+
+.pd-gallery-main {
+    grid-row: span 2;
+}
+
+/* Темно-зеленые карточки с фишками */
+.pd-features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin-bottom: 40px;
+}
+
+.pd-feature-card {
+    background-color: #4F5B46;
+    color: #fff;
+    padding: 20px;
+    border-radius: 16px;
+}
+
+.pd-feature-card h4 {
+    color: #F5C770;
+    font-size: 16px;
+    margin-bottom: 10px;
+    font-weight: 700;
+}
+
+.pd-feature-card p {
+    font-size: 13px;
+    line-height: 1.5;
+    opacity: 0.9;
+}
+
+/* Заголовки секций */
+.pd-section-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: #2d312a;
+    margin-bottom: 15px;
+}
+
+/* Блок Описания */
+.pd-description-block {
+    background-color: #FAF6EE;
+    border: 1px solid #E5DEC9;
+    padding: 20px;
+    border-radius: 16px;
+    margin-bottom: 40px;
+    font-size: 15px;
+    line-height: 1.6;
+    color: #444;
+}
+
+/* Блок вопроса */
+.pd-question-box {
+    display: flex;
+    align-items: center;
+    background-color: #F5C770;
+    padding: 10px 15px;
+    border-radius: 50px;
+    gap: 15px;
+}
+
+.pd-avatar-small {
+    width: 40px;
+    height: 40px;
+    background-color: #d1c7b8;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.pd-question-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    font-size: 15px;
+    color: #000;
+    font-family: inherit;
+}
+.pd-question-input::placeholder { color: rgba(0,0,0,0.5); }
+
+/* =========================================
+    ЛИПКИЙ САЙДБАР БРОНИРОВАНИЯ
+   ========================================= */
+.pd-booking-sidebar {
+    background-color: #FAF6EE;
+    border: 1px solid #E5DEC9;
+    border-radius: 20px;
+    padding: 24px;
+    position: sticky;
+    top: 100px; /* Прилипает при прокрутке с отступом от верха */
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+}
+
+.pd-rating-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background-color: #E8F5E9;
+    color: #2E7D32;
+    padding: 6px 12px;
+    border-radius: 50px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+.pd-rating-badge .rating-score {
+    background-color: #2E7D32;
+    color: #fff;
+    padding: 2px 8px;
+    border-radius: 10px;
+}
+
+.pd-price-block {
+    margin-bottom: 20px;
+}
+
+.pd-price-val {
+    font-size: 32px;
+    font-weight: 800;
+    color: #F5A623;
+}
+
+.pd-price-label {
+    font-size: 15px;
+    color: #666;
+}
+
+/* Форма бронирования */
+.pd-booking-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.pd-input-row {
+    display: flex;
+    gap: 10px;
+}
+
+.pd-input-box {
+    flex: 1;
+    background: #fff;
+    border: 1px solid #E5DEC9;
+    border-radius: 12px;
+    padding: 10px 15px;
+    display: flex;
+    flex-direction: column;
+}
+
+.pd-input-box label {
+    font-size: 11px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 4px;
+}
+
+/* Стилизация инпутов (включая нативный календарь) */
+.pd-input-box input {
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 14px;
+    color: #444;
+    font-family: inherit;
+    width: 100%;
+}
+
+/* Делаем иконку календаря чуть аккуратнее */
+.pd-input-box input[type="date"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: 0.6;
+}
+
+.pd-total-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 18px;
+    font-weight: 700;
+    margin: 20px 0;
+    padding-top: 15px;
+    border-top: 1px dashed #E5DEC9;
+    color: #2d312a;
+}
+
+.pd-book-btn {
+    background-color: #F5C770;
+    color: #000;
+    font-size: 18px;
+    font-weight: 700;
+    padding: 16px;
+    border-radius: 12px;
+    width: 100%;
+    transition: transform 0.2s, background-color 0.2s;
+    border: none;
+    cursor: pointer;
+}
+
+.pd-book-btn:hover:not(:disabled) {
+    transform: scale(1.02);
+    background-color: #f3bc5a;
+}
+
+.pd-book-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+/* =========================================
+    АДАПТИВ
+   ========================================= */
+@media (max-width: 1024px) {
+    .pd-layout { flex-direction: column; }
+    .pd-right-col { width: 100%; }
+    .pd-booking-sidebar { position: static; margin-top: 20px; }
+}
+
+@media (max-width: 768px) {
+    .pd-features-grid { grid-template-columns: 1fr; }
+    .pd-gallery { grid-template-columns: 1fr; grid-template-rows: auto; height: auto; }
+    .pd-gallery-main { grid-row: auto; height: 250px; }
+    .pd-gallery-side { height: 150px; }
+    .pd-main-content { margin-top: -20px; }
+    .pd-title { font-size: 26px; }
+}
+
+/* =========================================
+    НОВЫЙ САЙДБАР БРОНИРОВАНИЯ (ПО МАКЕТУ)
+   ========================================= */
+.pd-sidebar-new {
+    background-color: #F6EAD4; /* Кремовый фон блока */
+    border-radius: 24px;
+    padding: 20px;
+    position: sticky;
+    top: 100px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    /* position: relative; Для сердечка */
+}
+
+/* Зеленая плашка */
+.pd-availability-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background-color: #8BC34A; /* Зеленый */
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 50px;
+    margin-bottom: 15px;
+}
+
+.check-icon {
+    background: #fff;
+    color: #8BC34A;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+}
+
+/* Сердечко */
+.pd-heart-icon {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #999;
+    cursor: pointer;
+}
+
+/* Инпуты */
+.pd-booking-form-new {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.pd-inputs-row {
+    display: flex;
+    gap: 10px;
+}
+
+.pd-input-card {
+    background-color: #fff;
+    border: 1px solid #E5DEC9;
+    border-radius: 12px;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+}
+
+.pd-input-card.full-width {
+    width: 100%;
+}
+
+.pd-input-icon {
+    font-size: 18px;
+    color: #F5A623; /* Оранжевый */
+}
+
+.pd-input-content {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.pd-input-content label {
+    font-size: 12px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 2px;
+}
+
+.pd-input-content input {
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 13px;
+    color: #555;
+    font-family: inherit;
+    width: 100%;
+}
+
+.pd-input-sub {
+    font-size: 11px;
+    color: #888;
+}
+
+/* Блок цены */
+.pd-price-section {
+    background-color: #FAF6EE; /* Чуть светлее фона */
+    border: 1px solid #E5DEC9;
+    border-radius: 12px;
+    padding: 15px;
+    text-align: right;
+    margin-top: 5px;
+    margin-bottom: 10px;
+}
+
+.pd-price-main {
+    font-size: 28px;
+    font-weight: 800;
+    color: #F5A623;
+    line-height: 1;
+    margin-bottom: 5px;
+}
+
+.pd-price-sub {
+    font-size: 11px;
+    color: #777;
+}
+
+/* Кнопка Далі */
+.pd-btn-dali {
+    background-color: #F5A623;
+    color: #000;
+    font-size: 18px;
+    font-weight: 700;
+    padding: 14px;
+    border-radius: 50px;
+    width: 100%;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+.pd-btn-dali:hover:not(:disabled) {
+    transform: scale(1.02);
+}
+
+/* Блок Скасування */
+.pd-cancel-section {
+    margin-top: 25px;
+    padding-top: 20px;
+}
+
+.pd-cancel-section h3 {
+    font-size: 16px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.pd-divider {
+    border: none;
+    border-top: 2px solid #333;
+    margin-bottom: 20px;
+}
+
+/* Таймлайн */
+.pd-timeline {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    position: relative;
+}
+
+.timeline-point {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    z-index: 2;
+}
+
+.timeline-label {
+    background-color: #E8D4A2; /* Темно-бежевый */
+    color: #333;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 8px;
+    border-radius: 4px;
+    margin-bottom: 8px;
+}
+
+.timeline-dot {
+    width: 12px;
+    height: 12px;
+    background-color: #F5A623;
+    border-radius: 50%;
+    border: 2px solid #F6EAD4;
+    box-shadow: 0 0 0 1px #F5A623;
+}
+
+.timeline-line {
+    flex: 1;
+    height: 2px;
+    border-bottom: 2px dashed #F5A623;
+    margin: 0 5px;
+    position: relative;
+    top: 6px;
+}
+
+.pd-timeline-texts {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    color: #666;
+    text-align: center;
+}
+
+.pd-timeline-texts span {
+    flex: 1;
+}
+
+
