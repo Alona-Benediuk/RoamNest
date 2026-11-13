@@ -1,33 +1,76 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getProperties } from '../api/properties';
 import PropertyListItem from '../components/property/PropertyListItem';
 import FiltersSidebar from '../components/property/FiltersSidebar';
+import SearchMap from '../components/search/SearchMap';
+import { DEMO_PROPERTIES } from '../data/demoProperties';
+import './Search.css';
+
+const PAGE_SIZE = 5;
+
+// Відповідність фільтрів «Тип розміщення» типам житла на бекенді (property_type)
+const TYPE_MAP = {
+    'Готелі': ['HOTEL'],
+    'Апартаменти': ['APARTMENT', 'ROOM'],
+    'Хостели': ['HOSTEL'],
+    'Будинки': ['HOUSE', 'VILLA'],
+};
+
+// «Тип місцевості» → категорії (/api/categories/)
+const AREA_MAP = {
+    'Пляж': 'beach',
+    'У центрі міста': 'city',
+    'У горах': 'nature',
+    'Біля озера': 'nature',
+    'У лісі': 'nature',
+};
+
+const hasAmenity = (property, name) =>
+    (property.amenities || []).some((a) => a.name.toLowerCase() === name.toLowerCase());
+
+/* Фільтрація на клієнті: працює і з демо-даними, і з даними API.
+   Пізніше частину фільтрів можна передавати на бекенд (property_type, amenities, category). */
+const applyFilters = (items, f) => items.filter((p) => {
+    if (f.type?.length) {
+        const types = f.type.flatMap((t) => TYPE_MAP[t] || []);
+        if (!types.includes(p.property_type)) return false;
+    }
+    const wanted = [...(f.amenities || []), ...(f.room || [])];
+    if (wanted.some((name) => !hasAmenity(p, name))) return false;
+    if (f.area?.length) {
+        const slugs = f.area.map((a) => AREA_MAP[a]).filter(Boolean);
+        if (!(p.categories || []).some((c) => slugs.includes(c.slug))) return false;
+    }
+    return true;
+});
+
+const SearchField = ({ icon, label, value }) => (
+    <button type="button" className="rn-search-bar__field">
+        <span className="rn-search-bar__icon" aria-hidden="true">{icon}</span>
+        <span>
+            <span className="rn-search-bar__label">{label}</span>
+            <span className="rn-search-bar__value">{value}</span>
+        </span>
+    </button>
+);
 
 const Search = () => {
     const navigate = useNavigate();
     const [properties, setProperties] = useState([]);
     const [loading, setLoading] = useState(true);
-
-    // Заглушка данных для демонстрации (так как реальная база может быть пустой)
-    const mockProperties = Array(8).fill(null).map((_, i) => ({
-        id: i,
-        title: 'Lakefront Cabin: Private Beach, Kayaks',
-        city: 'Київ',
-        price_per_night: 341,
-        old_price: 1200,
-        main_image: 'https://images.unsplash.com/photo-1510798831971-661eb04b3739?q=80&w=600&auto=format&fit=crop'
-    }));
+    const [filters, setFilters] = useState({});
+    const [page, setPage] = useState(0);
 
     useEffect(() => {
         const loadData = async () => {
             try {
                 const data = await getProperties();
                 const items = Array.isArray(data) ? data : data.results || [];
-                // Если бэкенд вернул пустой массив, используем заглушки для красоты
-                setProperties(items.length > 0 ? items : mockProperties);
-            } catch (err) {
-                setProperties(mockProperties);
+                // Якщо в базі ще немає об'єктів — показуємо демо-дані
+                setProperties(items.length ? items : DEMO_PROPERTIES);
+            } catch {
+                setProperties(DEMO_PROPERTIES);
             } finally {
                 setLoading(false);
             }
@@ -35,75 +78,79 @@ const Search = () => {
         loadData();
     }, []);
 
+    const filtered = useMemo(() => applyFilters(properties, filters), [properties, filters]);
+    const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+    const visible = filtered.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
+
+    const handleFiltersChange = (next) => {
+        setFilters(next);
+        setPage(0); // після зміни фільтрів повертаємось на першу сторінку
+    };
+
+    const goToPage = (index) => {
+        setPage(index);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
     return (
-        <div className="search-page">
-            {/* Верхняя панель поиска */}
-            <div className="search-top-panel">
-                <div className="search-input-group">
-                    <span className="icon">🔍</span>
-                    <input type="text" placeholder="Країна, місто, адреса..." />
-                </div>
-                <div className="search-input-small">
-                    <span className="icon">📅</span>
-                    <div>
-                        <span className="label">Виїзд</span>
-                        <span className="val">Обрати дату</span>
-                    </div>
-                </div>
-                <div className="search-input-small">
-                    <span className="icon">📅</span>
-                    <div>
-                        <span className="label">В'їзд</span>
-                        <span className="val">Обрати дату</span>
-                    </div>
-                </div>
-                <div className="search-input-small">
-                    <span className="icon">👤</span>
-                    <div>
-                        <span className="label">Кількість</span>
-                        <span className="val">2 особи</span>
-                    </div>
-                </div>
-            </div>
+        <div className="rn-search">
+            <div className="rn-search__inner">
 
-            <div className="search-page-container">
-                <button className="btn-back-pill" onClick={() => navigate(-1)}>
-                    ↩ Назад
-                </button>
+                {/* Панель пошуку */}
+                <div className="rn-search-bar">
+                    <label className="rn-search-bar__input">
+                        <span aria-hidden="true">🔍</span>
+                        <input type="text" placeholder="Країна, місто, адреса..." aria-label="Країна, місто, адреса" />
+                    </label>
+                    <SearchField icon="📅" label="В'їзд" value="Обрати дату" />
+                    <SearchField icon="📅" label="Виїзд" value="Обрати дату" />
+                    <SearchField icon="👥" label="Кількість" value="2 особи" />
+                </div>
 
-                <div className="search-layout">
-                    {/* Левая колонка - Список жилья */}
-                    <div className="search-results">
-                        {properties.map((prop) => (
-                            <PropertyListItem key={prop.id} property={prop} />
-                        ))}
-                        
-                        {/* Пагинация */}
-                        <div className="pagination">
-                            <span className="dot active"></span>
-                            <span className="dot"></span>
-                            <span className="dot"></span>
-                            <span className="dot"></span>
-                            <span className="dot"></span>
-                        </div>
-                    </div>
+                {/* «Назад» і кількість результатів */}
+                <div className="rn-search__toolbar">
+                    <button type="button" className="rn-search__back" onClick={() => navigate(-1)}>
+                        <span aria-hidden="true">↩</span> Назад
+                    </button>
+                    {!loading && (
+                        <span className="rn-search__count">Знайдено варіантів: {filtered.length}</span>
+                    )}
+                </div>
 
-                    {/* Правая колонка - Карта и Фильтры */}
-                    <div className="search-sidebar">
-                        {/* Блок карты */}
-                        <div className="map-placeholder">
-                            <div className="map-pins">
-                                <span className="pin" style={{ top: '20%', left: '30%' }}>📍</span>
-                                <span className="pin" style={{ top: '40%', left: '60%' }}>📍</span>
-                                <span className="pin" style={{ top: '70%', left: '40%' }}>📍</span>
-                                <span className="pin" style={{ top: '60%', left: '20%' }}>📍</span>
-                                <span className="pin" style={{ top: '30%', left: '70%' }}>📍</span>
+                <div className="rn-search__layout">
+                    {/* Список житла */}
+                    <section className="rn-search__results" aria-label="Результати пошуку">
+                        {loading && <div className="loader">Завантаження...</div>}
+
+                        {!loading && visible.map((p) => <PropertyListItem key={p.id} property={p} />)}
+
+                        {!loading && filtered.length === 0 && (
+                            <div className="rn-search__empty">
+                                <p>За обраними фільтрами нічого не знайдено.</p>
+                                <button type="button" onClick={() => handleFiltersChange({})}>Скинути фільтри</button>
                             </div>
-                            <button className="map-btn">На карті</button>
-                        </div>
+                        )}
 
-                        {/* Блок фильтров */}
-                        <FiltersSidebar />
+                        {pageCount > 1 && (
+                            <nav className="rn-pagination" aria-label="Сторінки">
+                                {Array.from({ length: pageCount }, (_, i) => (
+                                    <button
+                                        key={i}
+                                        type="button"
+                                        className={i === page ? 'is-active' : ''}
+                                        aria-label={`Сторінка ${i + 1}`}
+                                        aria-current={i === page ? 'page' : undefined}
+                                        onClick={() => goToPage(i)}
+                                    />
+                                ))}
+                            </nav>
+                        )}
+                    </section>
+
+                    {/* Карта і фільтри */}
+                    <div className="rn-search__sidebar">
+                        <SearchMap />
+                        <FiltersSidebar selected={filters} onChange={handleFiltersChange} />
                     </div>
                 </div>
             </div>

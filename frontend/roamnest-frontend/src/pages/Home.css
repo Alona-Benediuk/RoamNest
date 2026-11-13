@@ -1,0 +1,237 @@
+/* =========================================================
+   Головна сторінка — секції під банером (за макетом Figma)
+   Макет зроблено під ширину екрана 1920px, контент — 1760px.
+   Кольори з макета:
+     accent  #26382E (темно-зелений)
+     main    #FCC05F (жовтий)
+     фон     #FFF6EC, картка #FFE5B6, ціна #FF9800
+   ========================================================= */
+
+/* Фото банера з макета (файл src/assets/hero.jpg).
+   Шлях відносний: Vite сам підключає файл і покаже помилку, якщо його немає */
+.hero-bg-image {
+    background-image: url('../assets/hero.jpg') !important;
+    background-size: cover !important;
+    background-position: center 60% !important;     /* у кадрі пальми й море */
+    opacity: 0.89;                                   /* у макеті: прозорість фото 89% */
+}
+
+/* Затемнення фото банера як у макеті: #403931, 50% */
+.hero-overlay {
+    background-color: rgba(64, 57, 49, 0.5) !important;
+}
+
+.rn-home {
+    --rn-green: #26382E;
+    --rn-cream: #FFF6EC;
+    --rn-peach: #FFE5B6;
+    --rn-orange: #FF9800;
+    --rn-yellow: #FCC05F;
+    --rn-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);  /* тінь з макета */
+
+    position: relative;
+    overflow: hidden;
+    padding: 72px clamp(16px, 4vw, 80px) 96px;
+    background-color: var(--rn-cream);
+}
+
+/* М'які жовті «плями» на фоні */
+.rn-home::before,
+.rn-home::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(110px);
+    pointer-events: none;
+    z-index: 0;
+}
+.rn-home::before {
+    width: 640px; height: 640px;
+    top: 22%; right: -220px;
+    background: rgba(252, 192, 95, 0.6);
+}
+.rn-home::after {
+    width: 560px; height: 560px;
+    bottom: 8%; left: -200px;
+    background: rgba(252, 192, 95, 0.45);
+}
+
+.rn-home__inner {
+    position: relative;
+    z-index: 1;
+    max-width: 1760px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(48px, 5vw, 96px);
+}
+
+/* ---------- Заголовок секції ---------- */
+.rn-section__head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+/* Темно-зелена «вкладка»: у макеті 423 × 76, радіус 200/200/0/200 */
+.rn-section__title {
+    min-width: clamp(200px, 22vw, 423px);
+    padding: clamp(12px, 1.25vw, 24px) clamp(20px, 1.9vw, 36px);
+    border-radius: 200px 200px 0 200px;
+    background-color: var(--rn-green);
+    color: var(--rn-cream);
+    font-size: clamp(18px, 1.45vw, 28px);
+    font-weight: 600;
+    line-height: 1.1;
+}
+
+/* «Дивитись далі»: у макеті 277 × 52, радіус 73, рамка 2px */
+.rn-section__more {
+    min-width: clamp(140px, 14.4vw, 277px);
+    padding: clamp(8px, 0.7vw, 13px) clamp(16px, 1.9vw, 36px);
+    border-radius: 73px;
+    border: 2px solid var(--rn-green);
+    background-color: transparent;
+    color: var(--rn-green);
+    font-size: clamp(13px, 0.95vw, 18px);
+    font-weight: 500;
+    white-space: nowrap;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+.rn-section__more:hover { background-color: var(--rn-green); color: var(--rn-cream); }
+
+/* ---------- Вкладки «Пляж / Місто / Природа» ---------- */
+.rn-tabs {
+    display: flex;
+    align-items: flex-end;
+    gap: 16px;
+    padding-top: 10px;
+    border-radius: 23px 23px 0 0;
+    background: linear-gradient(90deg, transparent 25%, rgba(242, 190, 140, 0.65) 100%);
+}
+
+.rn-tabs__tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+    padding: clamp(6px, 0.5vw, 10px) clamp(16px, 1.6vw, 30px);
+    border-radius: 73px;
+    border: 2px solid var(--rn-green);
+    background-color: #FFFFFF;
+    color: var(--rn-green);
+    font-size: clamp(14px, 1.05vw, 20px);
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+}
+.rn-tabs__tab:hover { background-color: var(--rn-peach); }
+
+/* Активна вкладка «зливається» з темно-зеленою панеллю */
+.rn-tabs__tab.is-active {
+    margin-bottom: 0;
+    padding: clamp(12px, 1vw, 20px) clamp(28px, 3vw, 56px);
+    border: none;
+    border-radius: 23px 23px 0 0;
+    background-color: var(--rn-green);
+    color: var(--rn-cream);
+}
+
+.rn-tabs__panel {
+    padding: clamp(14px, 1.2vw, 24px);
+    border-radius: 0 23px 23px 23px;
+    background-color: var(--rn-green);
+    box-shadow: var(--rn-shadow);
+}
+
+/* ---------- Стрічка карток ---------- */
+.rn-carousel__track {
+    --gap: clamp(14px, 1.2vw, 24px);
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: calc((100% - 3 * var(--gap)) / 4); /* 4 картки в ряд */
+    gap: var(--gap);
+    padding: 4px 2px 24px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+}
+.rn-carousel__track::-webkit-scrollbar { display: none; }
+
+.rn-carousel__item { scroll-snap-align: start; display: flex; }
+
+/* Смуга прогресу прокрутки */
+.rn-carousel__progress {
+    position: relative;
+    height: clamp(6px, 0.6vw, 12px);
+    margin-top: 10px;
+    border-radius: 12px;
+    background-color: #F3E1C6;
+    box-shadow: var(--rn-shadow);
+    overflow: hidden;
+}
+.rn-carousel__progress span {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    min-width: 14%;
+    border-radius: 12px;
+    background-color: var(--rn-orange);
+    transition: left 0.1s linear;
+}
+
+.rn-carousel--dark .rn-carousel__progress { background-color: var(--rn-cream); }
+
+/* ---------- Банер застосунку: у макеті 1760 × 370, радіуси 1000/1000/1000/0 ---------- */
+.rn-promo {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 12px 48px;
+    min-height: clamp(260px, 19.3vw, 370px);
+    padding: clamp(32px, 3vw, 56px) clamp(64px, 9vw, 180px) clamp(24px, 2vw, 40px) clamp(80px, 13vw, 260px);
+    border-radius: 1000px 1000px 1000px 0;
+    background-color: var(--rn-yellow);
+    color: var(--rn-green);
+    box-shadow: var(--rn-shadow);
+}
+
+.rn-promo__title { font-size: clamp(22px, 2vw, 38px); font-weight: 600; margin-bottom: 14px; }
+.rn-promo__desc { max-width: 720px; font-size: clamp(14px, 1.05vw, 20px); line-height: 1.5; }
+
+.rn-promo__qr {
+    padding: clamp(12px, 1vw, 20px);
+    border-radius: 23px;
+    background-color: #FFFFFF;
+}
+.rn-promo__qr img { display: block; width: clamp(96px, 8vw, 150px); height: auto; }
+
+.rn-promo__cta {
+    grid-column: 1 / -1;
+    text-align: center;
+    font-size: clamp(13px, 0.95vw, 18px);
+    font-weight: 500;
+}
+
+/* ---------- Адаптивність ---------- */
+@media (max-width: 1024px) {
+    .rn-carousel__track { grid-auto-columns: calc((100% - 2 * var(--gap)) / 3); }
+}
+
+@media (max-width: 768px) {
+    .rn-carousel__track { grid-auto-columns: 70%; }
+    .rn-section__title { min-width: 0; }
+    .rn-promo {
+        grid-template-columns: 1fr;
+        justify-items: center;
+        text-align: center;
+        padding: 32px 24px;
+        border-radius: 32px;
+    }
+}
+
+@media (max-width: 420px) {
+    .rn-carousel__track { grid-auto-columns: 85%; }
+    .rn-tabs { gap: 8px; }
+}

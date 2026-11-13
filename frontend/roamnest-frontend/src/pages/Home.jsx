@@ -1,20 +1,39 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { getProperties } from '../api/properties';
-import PropertyCard from '../components/property/PropertyCard';
+import PropertyCarousel from '../components/home/PropertyCarousel';
+import AppPromo from '../components/home/AppPromo';
+import { DEMO_PROPERTIES } from '../data/demoProperties';
+import './Home.css';
+
+// Вкладки верхньої секції. slug збігається з категоріями на бекенді (/api/categories/)
+const CATEGORY_TABS = [
+    { slug: 'beach', label: 'Пляж', icon: '⛱️' },
+    { slug: 'city', label: 'Місто', icon: '🏙️' },
+    { slug: 'nature', label: 'Природа', icon: '🌲' },
+];
+
+const SectionTitle = ({ id, children }) => (
+    <div className="rn-section__head">
+        <h2 id={id} className="rn-section__title">{children}</h2>
+        <button type="button" className="rn-section__more">Дивитись далі</button>
+    </div>
+);
 
 const Home = () => {
     const [properties, setProperties] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState('');
+    const [activeTab, setActiveTab] = useState('beach');
 
     useEffect(() => {
         const loadProperties = async () => {
             try {
                 const data = await getProperties();
                 const items = Array.isArray(data) ? data : data.results || [];
-                setProperties(items);
-            } catch (err) {
-                setError('Не вдалося завантажити помешкання.');
+                // Якщо в базі ще немає об'єктів — показуємо демо-картки
+                setProperties(items.length ? items : DEMO_PROPERTIES);
+            } catch {
+                // Бекенд недоступний — показуємо демо-картки, щоб сторінка не була порожньою
+                setProperties(DEMO_PROPERTIES);
             } finally {
                 setLoading(false);
             }
@@ -22,52 +41,63 @@ const Home = () => {
         loadProperties();
     }, []);
 
+    // Об'єкти активної вкладки; якщо в категорії порожньо — показуємо всі
+    const tabProperties = useMemo(() => {
+        const filtered = properties.filter((p) =>
+            (p.categories || []).some((c) => c.slug === activeTab)
+        );
+        return filtered.length ? filtered : properties;
+    }, [properties, activeTab]);
+
     if (loading) return <div className="loader">Завантаження...</div>;
-    if (error) return <div className="error-text">{error}</div>;
 
     return (
-        <div className="home-page-wrapper">
-            {/* Секция 1: Пляж */}
-            <section className="home-section">
-                <div className="section-top-bar">
-                    <div className="section-title-pill">Пляж</div>
-                    <div className="search-pills">
-                        <div className="search-pill">🔍 Місто</div>
-                        <div className="search-pill">🌴 Природа</div>
+        <div className="rn-home">
+            <div className="rn-home__inner">
+
+                {/* 1. Категорії: Пляж / Місто / Природа */}
+                <section className="rn-section" aria-label="Категорії житла">
+                    <div className="rn-tabs" role="tablist">
+                        {CATEGORY_TABS.map((tab) => (
+                            <button
+                                key={tab.slug}
+                                type="button"
+                                role="tab"
+                                aria-selected={activeTab === tab.slug}
+                                className={`rn-tabs__tab ${activeTab === tab.slug ? 'is-active' : ''}`}
+                                onClick={() => setActiveTab(tab.slug)}
+                            >
+                                <span aria-hidden="true">{tab.icon}</span> {tab.label}
+                            </button>
+                        ))}
                     </div>
-                </div>
-                <div className="properties-grid">
-                    {properties.slice(0, 4).map((property) => (
-                        <PropertyCard key={`beach-${property.id}`} property={property} />
-                    ))}
-                </div>
-            </section>
+                    <div className="rn-tabs__panel" role="tabpanel">
+                        <PropertyCarousel properties={tabProperties} dark />
+                    </div>
+                </section>
 
-            {/* Секция 2: Популярні */}
-            <section className="home-section">
-                <div className="section-header">
-                    <h2>Популярні</h2>
-                    <button className="btn-see-more">Дивитись далі</button>
-                </div>
-                <div className="properties-grid">
-                    {properties.slice(0, 4).map((property) => (
-                        <PropertyCard key={`pop-${property.id}`} property={property} />
-                    ))}
-                </div>
-            </section>
+                {/* 2. Популярні */}
+                <section className="rn-section" aria-labelledby="popular-title">
+                    <SectionTitle id="popular-title">Популярні</SectionTitle>
+                    <PropertyCarousel properties={properties} />
+                </section>
 
-            {/* Секция 3: Довгострокова оренда */}
-            <section className="home-section">
-                <div className="section-header">
-                    <h2>Довгострокова оренда</h2>
-                    <button className="btn-see-more">Дивитись далі</button>
-                </div>
-                <div className="properties-grid">
-                    {properties.slice(0, 4).map((property) => (
-                        <PropertyCard key={`long-${property.id}`} property={property} />
-                    ))}
-                </div>
-            </section>
+                {/* 3. Довгострокова оренда */}
+                <section className="rn-section" aria-labelledby="long-title">
+                    <SectionTitle id="long-title">Довгострокова оренда</SectionTitle>
+                    <PropertyCarousel properties={[...properties].reverse()} />
+                </section>
+
+                {/* 4. Банер мобільного застосунку */}
+                <AppPromo />
+
+                {/* 5. Раннє бронювання */}
+                <section className="rn-section" aria-labelledby="early-title">
+                    <SectionTitle id="early-title">Раннє бронювання</SectionTitle>
+                    <PropertyCarousel properties={properties} variant="deal" />
+                </section>
+
+            </div>
         </div>
     );
 };
