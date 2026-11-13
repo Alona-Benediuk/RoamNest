@@ -145,9 +145,12 @@ class BookingSerializer(serializers.ModelSerializer):
                 "guests": "Guests must be at least 1."
             })
 
+        # Для HOSTEL max_guests не обмежує кількість гостей
+        # в одному бронюванні, оскільки guests — це кількість ліжок.
         if (
             rental_unit
             and guests is not None
+            and rental_unit.property.property_type != "HOSTEL"
             and guests > rental_unit.max_guests
         ):
             raise serializers.ValidationError({
