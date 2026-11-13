@@ -1,11 +1,24 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import * as authApi from '../api/auth';
 import { useAuth } from '../hooks/useAuth';
 
 const Register = () => {
-    const [step, setStep] = useState(1); // 1: Роль, 2: Форма, 3: Успех
+    const [step, setStep] = useState(1); 
     const [role, setRole] = useState('USER'); 
-    const [formData, setFormData] = useState({ name: '', email: '', password: '', confirmPassword: '' });
+    
+    const [formData, setFormData] = useState({
+        username: '',
+        email: '',
+        password: '',
+        confirmPassword: '',
+        first_name: '',
+        last_name: ''
+    });
+
+    // ВОТ ЭТА СТРОКА БЫЛА УДАЛЕНА, ИЗ-ЗА НЕЕ ОШИБКА!
+    const [error, setError] = useState(''); 
+    const [isLoading, setIsLoading] = useState(false);
     
     const { login } = useAuth();
     const navigate = useNavigate();
@@ -14,25 +27,67 @@ const Register = () => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        setStep(3);
+        setError(''); // Теперь setError существует
+        
+        if (formData.password.length < 8) {
+            setError('Пароль повинен містити щонайменше 8 символів');
+            return;
+        }
+
+        if (formData.password !== formData.confirmPassword) {
+            setError('Паролі не співпадають');
+            return;
+        }
+
+        setIsLoading(true);
+
+        try {
+            const payload = {
+                username: formData.username,
+                email: formData.email,
+                password: formData.password,
+                password_confirm: formData.confirmPassword,
+                role: role,
+                first_name: formData.first_name,
+                last_name: formData.last_name
+            };
+
+            await authApi.register(payload);
+            await login(formData.username, formData.password);
+            setStep(3); 
+        } catch (err) {
+            console.error("Помилка від бекенду:", err.response?.data);
+            
+            const errorData = err.response?.data;
+            let errorMessage = 'Помилка реєстрації. Можливо, такий користувач вже існує.';
+            
+            if (errorData && typeof errorData === 'object') {
+                const errors = Object.entries(errorData).map(
+                    ([key, value]) => `${key}: ${value[0]}`
+                );
+                errorMessage = errors.join(' | ');
+            } else if (errorData?.detail) {
+                errorMessage = errorData.detail;
+            }
+            setError(errorMessage);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const handleFinish = () => {
-        login({ id: 1, username: formData.name || 'User', role: role });
         navigate('/');
     };
 
     return (
         <div className="auth-page-bg">
             <div className="auth-container">
-                {/* Кнопка Назад слева */}
                 <button className="btn-back" onClick={() => step === 1 ? navigate(-1) : setStep(1)}>
                     ↩ Назад
                 </button>
 
-                {/* Огромный логотип справа */}
                 <div className="auth-bg-logo">
                     <svg width="160" height="160" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M50 10L15 40V65H85V40L50 10Z" fill="#F3C770" />
@@ -46,7 +101,6 @@ const Register = () => {
                     </svg>
                 </div>
 
-                {/* ШАГ 1: Выбор роли */}
                 {step === 1 && (
                     <div className="auth-step-centered">
                         <h2 className="auth-title">Зареєструватися як</h2>
@@ -62,45 +116,52 @@ const Register = () => {
                     </div>
                 )}
 
-                {/* ШАГ 2: Форма */}
                 {step === 2 && (
                     <div className="auth-step-form">
                         <h2 className="auth-title">Зареєструватися як</h2>
                         
                         <div className="role-tabs">
-                            <button className={`role-tab ${role === 'OWNER' ? 'active' : ''}`} onClick={() => setRole('OWNER')}>Власник</button>
-                            <button className={`role-tab ${role === 'USER' ? 'active' : ''}`} onClick={() => setRole('USER')}>Гість</button>
+                            <button type="button" className={`role-tab ${role === 'OWNER' ? 'active' : ''}`} onClick={() => setRole('OWNER')}>Власник</button>
+                            <button type="button" className={`role-tab ${role === 'USER' ? 'active' : ''}`} onClick={() => setRole('USER')}>Гість</button>
                         </div>
+
+                        {error && <p style={{ color: '#ff5252', textAlign: 'center', marginBottom: '15px', fontWeight: 'bold' }}>{error}</p>}
 
                         <form onSubmit={handleSubmit} className="auth-form-modern">
                             <div className="input-group">
-                                <span className="input-label">Ім'я</span>
-                                <input type="text" name="name" placeholder="Олександр" onChange={handleChange} required />
+                                <span className="input-label">Логін</span>
+                                <input type="text" name="username" placeholder="Ваш логін" onChange={handleChange} required />
                             </div>
                             <div className="input-group">
                                 <span className="input-label">Email</span>
                                 <input type="email" name="email" placeholder="example@gmail.com" onChange={handleChange} required />
                             </div>
                             
-                            {role === 'OWNER' && (
-                                <>
-                                    <div className="input-group">
-                                        <span className="input-label">Пароль</span>
-                                        <input type="password" name="password" onChange={handleChange} required />
-                                    </div>
-                                    <div className="input-group">
-                                        <span className="input-label">Пароль</span>
-                                        <input type="password" name="confirmPassword" onChange={handleChange} required />
-                                    </div>
-                                </>
-                            )}
+                            <div className="input-group">
+                                <span className="input-label">Пароль (мін. 8 символів)</span>
+                                <input type="password" name="password" onChange={handleChange} required />
+                            </div>
+                            <div className="input-group">
+                                <span className="input-label">Підтвердіть пароль</span>
+                                <input type="password" name="confirmPassword" onChange={handleChange} required />
+                            </div>
 
-                            <button type="submit" className="btn-main-action">Далі</button>
+                            <div className="input-group">
+                                <span className="input-label">Ім'я</span>
+                                <input type="text" name="first_name" placeholder="Олександр" onChange={handleChange} />
+                            </div>
+                            <div className="input-group">
+                                <span className="input-label">Прізвище</span>
+                                <input type="text" name="last_name" placeholder="Шевченко" onChange={handleChange} />
+                            </div>
+
+                            <button type="submit" className="btn-main-action" disabled={isLoading}>
+                                {isLoading ? 'Завантаження...' : 'Далі'}
+                            </button>
                         </form>
                     </div>
                 )}
 
-                {/* ШАГ 3: Успех (Строго по макету) */}
                 {step === 3 && (
                     <div className="auth-step-success">
                         <div className="success-left">

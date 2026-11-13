@@ -2213,5 +2213,578 @@ button { cursor: pointer; border: none; font-family: inherit; }
     .checkout-progress { flex-direction: column; align-items: flex-start; border-radius: 20px; gap: 15px; }
 }
 
+/* =========================================
+   PROFILE / GUEST CABINET (КАБИНЕТ ГОСТЯ)
+   ========================================= */
+.profile-page {
+    background: linear-gradient(180deg, #FDFBF7 0%, #F8F5EE 100%);
+    min-height: 100vh;
+    padding: 100px 0 60px 0;
+}
+
+.profile-layout {
+    display: flex;
+    gap: 30px;
+    align-items: flex-start;
+}
+
+/* ЛЕВАЯ КОЛОНКА */
+.profile-sidebar {
+    width: 320px;
+    background-color: #F8F5EE;
+    border-radius: 20px;
+    padding: 20px;
+    flex-shrink: 0;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    position: relative;
+}
+
+.profile-back {
+    background: #F5A623;
+    color: #000;
+    margin-bottom: 20px;
+}
+
+.profile-avatar {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin: 0 auto 20px auto;
+    border: 4px solid #fff;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.profile-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.profile-section-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #F5A623;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.info-icon {
+    font-size: 12px;
+    color: #999;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.info-label {
+    font-size: 12px;
+    color: #888;
+    font-weight: 600;
+}
+
+.info-value {
+    font-size: 14px;
+    color: #333;
+    font-weight: 500;
+}
+
+.profile-info-section {
+    margin-bottom: 25px;
+}
+
+.btn-outline {
+    background: transparent;
+    border: 1px solid #333;
+    color: #333;
+    padding: 8px 16px;
+    border-radius: 50px;
+    font-size: 13px;
+    font-weight: 600;
+    width: 100%;
+    margin-top: 5px;
+    transition: all 0.2s;
+}
+
+.btn-outline:hover {
+    background: #333;
+    color: #fff;
+}
+
+.profile-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #E5DEC9;
+}
+
+/* ПРАВАЯ КОЛОНКА */
+.profile-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.profile-card {
+    background-color: #fff;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+}
+
+.card-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #F5A623;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* Чат */
+.chat-preview {
+    display: flex;
+    gap: 15px;
+    background-color: #F6EAD4;
+    padding: 15px;
+    border-radius: 12px;
+    align-items: flex-start;
+}
+
+.chat-avatar img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.chat-bubble {
+    flex: 1;
+}
+
+.chat-author {
+    font-size: 12px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 4px;
+}
+
+.chat-text {
+    font-size: 14px;
+    color: #555;
+    line-height: 1.4;
+}
+
+.chat-time {
+    font-size: 11px;
+    color: #999;
+    text-align: right;
+    margin-top: 5px;
+}
+
+/* Оранжевые заголовки */
+.card-header-orange {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #F5A623;
+    padding: 12px 20px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+}
+
+.card-title-text {
+    font-size: 16px;
+    font-weight: 700;
+    color: #000;
+}
+
+.dropdown-arrow-orange {
+    font-size: 12px;
+    color: #000;
+}
+
+/* Элементы бронирования */
+.booking-history-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    background-color: #F8F5EE;
+    border-radius: 12px;
+    margin-bottom: 10px;
+}
+
+.booking-history-item img {
+    width: 120px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.booking-info {
+    flex: 1;
+}
+
+.booking-info h4 {
+    font-size: 15px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 4px;
+}
+
+.booking-info p {
+    font-size: 13px;
+    color: #777;
+    margin-bottom: 8px;
+}
+
+.booking-tag {
+    display: inline-block;
+    background-color: #E8F5E9;
+    color: #2E7D32;
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 50px;
+    font-weight: 600;
+}
+
+.booking-price-dates {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+}
+
+.booking-price {
+    background-color: #F5A623;
+    color: #000;
+    font-size: 16px;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 6px;
+}
+
+.booking-dates {
+    display: flex;
+    gap: 5px;
+}
+
+.booking-dates span {
+    background-color: #4F5B46;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 6px;
+}
+
+/* Список желаний */
+.wishlist-item {
+    display: flex;
+    background-color: #F8F5EE;
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.wishlist-item > img {
+    width: 200px;
+    object-fit: cover;
+}
+
+.wishlist-info {
+    padding: 20px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.wishlist-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.wishlist-header h4 {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+
+.heart-icon {
+    background: #fff;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    font-size: 18px;
+    color: #999;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.wishlist-info p {
+    font-size: 13px;
+    color: #777;
+    margin-bottom: 4px;
+}
+
+.wishlist-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-top: auto;
+}
+
+.wishlist-dots {
+    display: flex;
+    gap: 6px;
+}
+
+.wishlist-dots .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: #4F5B46;
+}
+.wishlist-dots .dot.active {
+    background-color: #F5A623;
+}
+
+.wishlist-price {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.wishlist-price .price {
+    background-color: #F5C770;
+    padding: 4px 12px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 16px;
+}
+
+.wishlist-price .rating {
+    font-size: 14px;
+    font-weight: 700;
+    color: #F5A623;
+    line-height: 1.1;
+    text-align: right;
+}
+.wishlist-price .rating small {
+    font-size: 10px;
+    color: #777;
+    font-weight: 400;
+}
+
+/* Адаптив */
+@media (max-width: 1024px) {
+    .profile-layout { flex-direction: column; }
+    .profile-sidebar { width: 100%; }
+    .info-grid { grid-template-columns: repeat(4, 1fr); }
+}
+
+@media (max-width: 768px) {
+    .booking-history-item { flex-direction: column; align-items: flex-start; }
+    .booking-history-item img { width: 100%; height: 150px; }
+    .booking-price-dates { flex-direction: row; justify-content: space-between; width: 100%; }
+    .wishlist-item { flex-direction: column; }
+    .wishlist-item > img { width: 100%; height: 200px; }
+    .info-grid { grid-template-columns: 1fr 1fr; }
+}
+
+/* =========================================
+    OWNER DASHBOARD (КАБИНЕТ ВЛАСНИКА)
+   ========================================= */
+
+/* Список об'єктів власника */
+.owner-property-item {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    background-color: #F8F5EE;
+    border-radius: 16px;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+
+.owner-property-item img {
+    width: 150px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+.owner-property-info {
+    flex: 1;
+}
+
+.owner-property-info h4 {
+    font-size: 16px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.owner-property-info p {
+    font-size: 13px;
+    color: #777;
+    margin-bottom: 3px;
+}
+
+.btn-edit-property {
+    background-color: #F5A623;
+    color: #000;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 10px 24px;
+    border-radius: 50px;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.btn-edit-property:hover {
+    transform: scale(1.05);
+}
+
+/* Календар */
+.owner-calendar-layout {
+    display: flex;
+    gap: 20px;
+    background-color: #F8F5EE;
+    border-radius: 16px;
+    padding: 20px;
+}
+
+.calendar-grid-wrapper {
+    flex: 1.5;
+}
+
+.calendar-header {
+    margin-bottom: 15px;
+}
+
+.btn-cal-nav {
+    background: #fff;
+    border: 1px solid #E5DEC9;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-weight: 600;
+    color: #333;
+}
+
+.calendar-days-header {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    text-align: center;
+    font-size: 12px;
+    font-weight: 700;
+    color: #888;
+    margin-bottom: 10px;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+}
+
+.calendar-day {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 40px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+    cursor: pointer;
+}
+
+.calendar-day:hover {
+    background-color: #E5DEC9;
+}
+
+.calendar-day.selected {
+    background-color: #F5A623;
+    color: #000;
+    font-weight: 700;
+}
+
+/* Список событий в календаре */
+.calendar-events-list {
+    flex: 1;
+    border-left: 1px solid #E5DEC9;
+    padding-left: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.calendar-search input {
+    width: 100%;
+    padding: 10px 15px;
+    border-radius: 20px;
+    border: 1px solid #E5DEC9;
+    background: #fff;
+    font-size: 13px;
+    margin-bottom: 15px;
+    outline: none;
+}
+
+.events-scroll {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.calendar-event-item {
+    padding: 10px 15px;
+    border-radius: 8px;
+    font-size: 12px;
+}
+
+.event-color-0 { background-color: #8BC34A; color: #fff; } /* Зеленый */
+.event-color-1 { background-color: #F5A623; color: #000; } /* Оранжевый */
+.event-color-2 { background-color: #E57373; color: #fff; } /* Красный */
+
+.event-title {
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.event-dates {
+    opacity: 0.9;
+}
+
+/* Адаптив */
+@media (max-width: 1024px) {
+    .owner-calendar-layout { flex-direction: column; }
+    .calendar-events-list { border-left: none; border-top: 1px solid #E5DEC9; padding-left: 0; padding-top: 20px; }
+}
+@media (max-width: 600px) {
+    .owner-property-item { flex-direction: column; align-items: flex-start; }
+    .owner-property-item img { width: 100%; height: 150px; }
+}
 
 
