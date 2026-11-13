@@ -3,12 +3,13 @@ import { getProperties } from '../api/properties';
 import PropertyCarousel from '../components/home/PropertyCarousel';
 import AppPromo from '../components/home/AppPromo';
 import { DEMO_PROPERTIES } from '../data/demoProperties';
+import Icon from '../components/common/Icon';
 import './Home.css';
 
 const CATEGORY_TABS = [
-    { slug: 'beach', label: 'Пляж', icon: '⛱️' },
-    { slug: 'city', label: 'Місто', icon: '🏙️' },
-    { slug: 'nature', label: 'Природа', icon: '🌲' },
+    { slug: 'beach', label: 'Пляж', icon: 'beach' },
+    { slug: 'city', label: 'Місто', icon: 'city' },
+    { slug: 'nature', label: 'Природа', icon: 'nature' },
 ];
 
 const SectionTitle = ({ id, children }) => (
@@ -63,7 +64,7 @@ const Home = () => {
                                 className={`rn-tabs__tab ${activeTab === tab.slug ? 'is-active' : ''}`}
                                 onClick={() => setActiveTab(tab.slug)}
                             >
-                                <span aria-hidden="true">{tab.icon}</span> {tab.label}
+                                <Icon name={tab.icon} /> {tab.label}
                             </button>
                         ))}
                     </div>

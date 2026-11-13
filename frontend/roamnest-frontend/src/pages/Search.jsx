@@ -5,6 +5,7 @@ import PropertyListItem from '../components/property/PropertyListItem';
 import FiltersSidebar from '../components/property/FiltersSidebar';
 import SearchMap from '../components/search/SearchMap';
 import { DEMO_PROPERTIES } from '../data/demoProperties';
+import Icon from '../components/common/Icon';
 import './Search.css';
 
 const PAGE_SIZE = 5;
@@ -43,7 +44,7 @@ const applyFilters = (items, f) => items.filter((p) => {
 
 const SearchField = ({ icon, label, value }) => (
     <button type="button" className="rn-search-bar__field">
-        <span className="rn-search-bar__icon" aria-hidden="true">{icon}</span>
+        <span className="rn-search-bar__icon"><Icon name={icon} /></span>
         <span>
             <span className="rn-search-bar__label">{label}</span>
             <span className="rn-search-bar__value">{value}</span>
@@ -92,12 +93,12 @@ const Search = () => {
             <div className="rn-search__inner">
                 <div className="rn-search-bar">
                     <label className="rn-search-bar__input">
-                        <span aria-hidden="true">🔍</span>
+                        <span className="rn-search-bar__icon is-dark"><Icon name="search" /></span>
                         <input type="text" placeholder="Країна, місто, адреса..." aria-label="Країна, місто, адреса" />
                     </label>
-                    <SearchField icon="📅" label="В'їзд" value="Обрати дату" />
-                    <SearchField icon="📅" label="Виїзд" value="Обрати дату" />
-                    <SearchField icon="👥" label="Кількість" value="2 особи" />
+                    <SearchField icon="checkIn" label="В'їзд" value="Обрати дату" />
+                    <SearchField icon="checkOut" label="Виїзд" value="Обрати дату" />
+                    <SearchField icon="people" label="Кількість" value="2 особи" />
                 </div>
 
                 <div className="rn-search__toolbar">

@@ -69,7 +69,8 @@
 
 .rn-search-bar__field { cursor: pointer; transition: border-color 0.2s ease; }
 .rn-search-bar__field:hover { border-color: var(--s-orange); }
-.rn-search-bar__icon { font-size: 18px; }
+.rn-search-bar__icon { color: #FA9B00; font-size: 22px; line-height: 0; }
+.rn-search-bar__icon.is-dark { color: #34352F; }
 .rn-search-bar__label { display: block; font-size: clamp(14px, 1vw, 18px); font-weight: 600; }
 .rn-search-bar__value { display: block; font-size: 11px; opacity: 0.7; }
 

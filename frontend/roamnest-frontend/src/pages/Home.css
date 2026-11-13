@@ -145,7 +145,14 @@
 
 .rn-carousel__item { scroll-snap-align: start; display: flex; }
 
-/* Смуга прогресу прокрутки */
+.rn-carousel__track { cursor: grab; }
+.rn-carousel__track.is-dragging {
+    cursor: grabbing;
+    scroll-snap-type: none;
+    user-select: none;
+}
+
+/* Смуга прогресу: можна тягнути або клікнути */
 .rn-carousel__progress {
     position: relative;
     height: clamp(6px, 0.6vw, 12px);
@@ -153,17 +160,23 @@
     border-radius: 12px;
     background-color: #F3E1C6;
     box-shadow: var(--rn-shadow);
-    overflow: hidden;
+    cursor: pointer;
+    touch-action: none;
+}
+.rn-carousel__progress::before {
+    content: '';
+    position: absolute;
+    inset: -10px 0;
 }
 .rn-carousel__progress span {
     position: absolute;
     top: 0;
     height: 100%;
-    min-width: 14%;
     border-radius: 12px;
     background-color: var(--rn-orange);
-    transition: left 0.1s linear;
+    cursor: grab;
 }
+.rn-carousel__progress:active span { cursor: grabbing; }
 
 .rn-carousel--dark .rn-carousel__progress { background-color: var(--rn-cream); }
 
@@ -183,19 +196,36 @@
 .rn-promo__title { font-size: clamp(22px, 2vw, 38px); font-weight: 600; margin-bottom: 14px; }
 .rn-promo__desc { max-width: 720px; font-size: clamp(14px, 1.05vw, 20px); line-height: 1.5; }
 
-.rn-promo__qr {
-    padding: clamp(12px, 1vw, 20px);
+.rn-promo__logo {
+    display: grid;
+    place-items: center;
+    padding: clamp(14px, 1.2vw, 24px);
     border-radius: 23px;
-    background-color: #FFFFFF;
+    background-color: rgba(255, 255, 255, 0.55);
 }
-.rn-promo__qr img { display: block; width: clamp(96px, 8vw, 150px); height: auto; }
 
 .rn-promo__cta {
     grid-column: 1 / -1;
-    text-align: center;
+    justify-self: center;
+    color: var(--rn-green);
     font-size: clamp(13px, 0.95vw, 18px);
-    font-weight: 500;
+    font-weight: 600;
+    text-decoration: none;
 }
+.rn-promo__cta:hover { text-decoration: underline; }
+
+/* ---------- Іконки й логотип ---------- */
+.rn-icon { display: inline-block; vertical-align: middle; flex-shrink: 0; }
+
+.cat-icon,
+.field-icon { color: #FA9B00; font-size: 22px; line-height: 0; }
+.search-icon,
+.cat-icon.is-dark { color: #34352F; font-size: 20px; line-height: 0; }
+
+.rn-tabs__tab .rn-icon { color: #FA9B00; }
+
+.logo-container,
+.footer-brand { display: inline-flex; align-items: center; gap: 10px; }
 
 @media (max-width: 1024px) {
     .rn-carousel__track { grid-auto-columns: calc((100% - 2 * var(--gap)) / 3); }
