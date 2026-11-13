@@ -4,10 +4,11 @@ import ProtectedRoute from './components/common/ProtectedRoute';
 import Layout from './components/layout/Layout';
 
 import Home from './pages/Home';
-import Search from './pages/Search'; // <-- ДОБАВЛЕНО
+import Search from './pages/Search'; 
 import Login from './pages/Login';
 import Register from './pages/Register'; 
 import PropertyDetails from './pages/PropertyDetails';
+import BookingCheckout from './pages/BookingCheckout';
 import Profile from './pages/Profile';
 import MyBookings from './pages/MyBookings';
 import OwnerDashboard from './pages/owner/OwnerDashboard';
@@ -20,10 +21,10 @@ function App() {
         <AuthProvider>
             <BrowserRouter>
                 <Routes>
-                    {/* Публичные маршруты (доступны всем) */}
+                    {/* Публичные маршруты */}
                     <Route element={<Layout />}>
                         <Route path="/" element={<Home />} />
-                        <Route path="/search" element={<Search />} /> {/* <-- ДОБАВЛЕНО МАРШРУТ */}
+                        <Route path="/search" element={<Search />} />
                         <Route path="/properties/:id" element={<PropertyDetails />} />
                         <Route path="/login" element={<Login />} />
                         <Route path="/register" element={<Register />} /> 
@@ -34,6 +35,7 @@ function App() {
                         <Route element={<Layout />}>
                             <Route path="/profile" element={<Profile />} />
                             <Route path="/my-bookings" element={<MyBookings />} />
+                            <Route path="/checkout" element={<BookingCheckout />} />
                         </Route>
                     </Route>
 

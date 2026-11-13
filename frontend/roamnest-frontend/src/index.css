@@ -1905,4 +1905,313 @@ button { cursor: pointer; border: none; font-family: inherit; }
     flex: 1;
 }
 
+/* =========================================
+    BOOKING CHECKOUT PAGE (СТРАНИЦА ОФОРМЛЕНИЯ)
+   ========================================= */
+.checkout-page {
+    background-color: #F8F5EE;
+    min-height: 100vh;
+    padding: 100px 0 60px 0; /* Отступ под хедер */
+}
+
+.checkout-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Прогресс-бар */
+.checkout-progress {
+    background-color: #4F5B46;
+    color: #fff;
+    padding: 15px 30px;
+    border-radius: 50px;
+    display: inline-flex;
+    align-items: center;
+    gap: 30px;
+    margin-bottom: 30px;
+}
+
+.checkout-progress h1 {
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.progress-steps {
+    display: flex;
+    gap: 15px;
+}
+
+.step {
+    font-size: 12px;
+    background-color: #F5C770;
+    color: #000;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-weight: 600;
+}
+
+/* Сетка */
+.checkout-layout {
+    display: flex;
+    gap: 30px;
+    align-items: flex-start;
+}
+
+.checkout-left {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.checkout-right {
+    width: 400px;
+    flex-shrink: 0;
+}
+
+/* Секции формы */
+.checkout-section {
+    background-color: #FDFBF7;
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+}
+
+.checkout-section h2 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #2d312a;
+    margin-bottom: 20px;
+}
+
+.checkout-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.full-width {
+    grid-column: span 2;
+}
+
+/* Инпуты */
+.checkout-input-box {
+    display: flex;
+    flex-direction: column;
+    background-color: #F6EAD4;
+    border-radius: 12px;
+    padding: 12px 16px;
+}
+
+.checkout-input-box label {
+    font-size: 12px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 4px;
+}
+
+.checkout-input-box input {
+    background: transparent;
+    border: none;
+    outline: none;
+    font-size: 15px;
+    color: #444;
+    font-family: inherit;
+}
+.checkout-input-box input::placeholder { color: #999; }
+
+/* Оплата */
+.payment-radio {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 15px;
+    cursor: pointer;
+}
+
+.payment-radio input {
+    accent-color: #F5A623;
+    width: 18px;
+    height: 18px;
+}
+
+.payment-inputs {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* Правила */
+.rules-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.rule-item {
+    font-size: 14px;
+    color: #555;
+    padding-bottom: 10px;
+    border-bottom: 1px dashed #E5DEC9;
+}
+.rule-item span { font-weight: 700; color: #333; }
+
+.rules-warning {
+    font-size: 12px;
+    color: #888;
+    margin-bottom: 20px;
+}
+
+.btn-checkout-submit {
+    background-color: #F5C770;
+    color: #000;
+    font-size: 18px;
+    font-weight: 700;
+    padding: 16px;
+    border-radius: 50px;
+    width: 100%;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+.btn-checkout-submit:hover:not(:disabled) { transform: scale(1.02); }
+.btn-checkout-submit:disabled { opacity: 0.7; cursor: not-allowed; }
+
+/* Правая колонка (Карточка) */
+.checkout-summary {
+    background-color: #F6EAD4;
+    border-radius: 20px;
+    padding: 24px;
+    position: sticky;
+    top: 100px;
+}
+
+.summary-property {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.summary-property img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 12px;
+}
+
+.summary-property-info h3 {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 5px;
+    color: #2d312a;
+}
+
+.summary-property-info p {
+    font-size: 13px;
+    color: #666;
+    margin-bottom: 8px;
+}
+
+.summary-rating {
+    display: inline-block;
+    background-color: #E8F5E9;
+    color: #2E7D32;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 700;
+}
+.summary-rating span { font-weight: 400; font-size: 11px; color: #555; }
+
+.summary-details {
+    border-top: 1px solid #E5DEC9;
+    border-bottom: 1px solid #E5DEC9;
+    padding: 15px 0;
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    color: #555;
+}
+
+.summary-pricing {
+    margin-bottom: 20px;
+}
+
+.summary-pricing h4 {
+    font-size: 16px;
+    margin-bottom: 15px;
+    color: #2d312a;
+}
+
+.summary-price-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 8px;
+}
+
+.summary-total {
+    display: flex;
+    justify-content: space-between;
+    font-size: 20px;
+    font-weight: 800;
+    color: #2d312a;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 2px dashed #E5DEC9;
+}
+
+.btn-summary-cancel {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background-color: transparent;
+    border: 1px solid #E5DEC9;
+    color: #555;
+    padding: 12px;
+    border-radius: 50px;
+    width: 100%;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    cursor: pointer;
+}
+
+.summary-guarantee {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background-color: #F5A623;
+    padding: 12px;
+    border-radius: 12px;
+}
+
+.guarantee-icon { font-size: 24px; }
+.summary-guarantee strong { font-size: 14px; display: block; color: #000; }
+.summary-guarantee p { font-size: 12px; color: #333; }
+
+/* Адаптив */
+@media (max-width: 900px) {
+    .checkout-layout { flex-direction: column-reverse; }
+    .checkout-right { width: 100%; }
+    .checkout-summary { position: static; }
+    .checkout-grid-2 { grid-template-columns: 1fr; }
+    .full-width { grid-column: span 1; }
+    .checkout-progress { flex-direction: column; align-items: flex-start; border-radius: 20px; gap: 15px; }
+}
+
+
 
