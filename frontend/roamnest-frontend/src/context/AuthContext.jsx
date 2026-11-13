@@ -1,4 +1,5 @@
 import { createContext, useState, useEffect, useContext } from 'react';
+import * as authApi from '../api/auth';
 
 const AuthContext = createContext(null);
 
@@ -7,20 +8,47 @@ export const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const savedUser = localStorage.getItem('mock_user');
-        if (savedUser) {
-            setUser(JSON.parse(savedUser));
-        }
-        setLoading(false);
+        const initAuth = async () => {
+            const token = localStorage.getItem('access_token');
+            
+            if (token) {
+                try {
+                    // Проверяем токен на бэкенде
+                    const userData = await authApi.getMe();
+                    setUser(userData);
+                } catch (error) {
+                    // Если токен протух или неверный - выкидываем
+                    localStorage.removeItem('access_token');
+                    localStorage.removeItem('refresh_token');
+                    setUser(null);
+                }
+            }
+            setLoading(false);
+        };
+
+        initAuth();
     }, []);
 
-    const login = (userData) => {
-        localStorage.setItem('mock_user', JSON.stringify(userData));
+    const login = async (email, password) => {
+        // Делаем реальный запрос к Django
+        const data = await authApi.login(email, password);
+        
+        // Сохраняем реальные токены
+        localStorage.setItem('access_token', data.access);
+        localStorage.setItem('refresh_token', data.refresh);
+        
+        // Запрашиваем профиль, чтобы узнать роль
+        const userData = await authApi.getMe();
         setUser(userData);
+        return userData;
     };
 
     const logout = () => {
-        localStorage.removeItem('mock_user');
+        try {
+            authApi.logout(); // Говорим бэкенду разлогиниться
+        } catch(e) {}
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('refresh_token');
         setUser(null);
     };
 
