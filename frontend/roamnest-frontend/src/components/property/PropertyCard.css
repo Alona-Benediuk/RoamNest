@@ -1,0 +1,188 @@
+/* =========================================================
+   Картка житла (за макетом Figma, головна сторінка)
+   Макет: картка 425 × 409 (раннє бронювання 425 × 456), радіус 23–24px,
+   фото 425 × 280 з радіусами 23 / 23 / 0 / 140px, фон картки #FFE4B9.
+   ========================================================= */
+
+.rn-card {
+    --card-bg: #FFE4B9;
+    --card-green: #26382E;
+    --card-orange: #FF9800;
+
+    position: relative;
+    width: 100%;
+    align-self: start;               /* картка не розтягується по висоті сусідньої */
+    border-radius: 23px;
+    background-color: var(--card-bg);
+    box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.rn-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 22px rgba(0, 0, 0, 0.2);
+}
+
+.rn-card__link {
+    display: block;
+    color: var(--card-green);
+    text-decoration: none;
+}
+
+/* ---------- Фото ---------- */
+.rn-card__media {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 425 / 280;                            /* фото завжди однакової форми */
+    border-radius: 23px 23px 0 33% / 23px 23px 0 50%;   /* у макеті: 23 / 23 / 0 / 140px */
+    overflow: hidden;
+    background-color: #E9C98F;
+}
+
+/* Фото заповнює блок і обрізається, а не розтягує картку */
+.rn-card__image {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+}
+
+.rn-card:hover .rn-card__image { transform: scale(1.05); }
+
+/* Стрілочка гортання фото (праворуч на фото, як у макеті) */
+.rn-card__arrow {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    display: grid;
+    place-items: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background-color: rgba(38, 56, 46, 0.55);
+    color: #FFFFFF;
+    font-size: 13px;
+    line-height: 1;
+}
+
+/* Крапки-індикатор фото (картка «Раннє бронювання») */
+.rn-card__dots {
+    position: absolute;
+    left: 50%;
+    bottom: 10px;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 4px;
+}
+.rn-card__dots i {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: var(--card-orange);
+    opacity: 0.55;
+}
+.rn-card__dots i.is-active { opacity: 1; }
+
+/* ---------- Текст ---------- */
+.rn-card__body {
+    position: relative;
+    min-height: 100px;
+    padding: 12px 52px 30px 14px;
+}
+
+.rn-card__title {
+    margin: 0 0 4px;
+    font-size: clamp(11px, 0.75vw, 14px);
+    font-weight: 700;
+    line-height: 1.3;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.rn-card__meta {
+    margin: 0;
+    font-size: clamp(10px, 0.65vw, 12px);
+    line-height: 1.6;
+    color: rgba(38, 56, 46, 0.7);
+}
+
+.rn-card__heart {
+    position: absolute;
+    top: 30px;
+    right: 12px;
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.15s ease;
+}
+.rn-card__heart:hover { background-color: rgba(255, 255, 255, 0.6); }
+.rn-card__heart:active { transform: scale(0.88); }
+
+/* Ціна — помаранчева «пігулка», що виходить за нижній край картки */
+.rn-card__price {
+    position: absolute;
+    right: 12px;
+    bottom: -12px;
+    padding: 5px 16px;
+    border-radius: 50px;
+    background-color: var(--card-orange);
+    color: #FFFFFF;
+    font-size: clamp(13px, 0.95vw, 18px);
+    font-weight: 600;
+    box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
+}
+
+/* ---------- Варіант «Раннє бронювання» ---------- */
+.rn-card--deal .rn-card__body {
+    min-height: 140px;
+    padding-bottom: 44px;
+}
+
+.rn-card--deal .rn-card__heart {
+    top: auto;
+    bottom: 8px;
+    left: 8px;
+    right: auto;
+}
+
+/* Блок ціни праворуч: ціна за ніч, сума за період, дати */
+.rn-card__deal {
+    position: absolute;
+    top: 34px;                       /* під назвою, навпроти міста — як у макеті */
+    right: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 3px;
+}
+
+.rn-card--deal .rn-card__price {
+    position: static;
+}
+
+.rn-card__total {
+    font-size: clamp(9px, 0.6vw, 11px);
+    color: rgba(38, 56, 46, 0.7);
+}
+
+.rn-card__dates {
+    padding: 2px 10px;
+    border-radius: 50px;
+    background-color: #B5342A;
+    color: #FFFFFF;
+    font-size: clamp(9px, 0.6vw, 11px);
+    font-weight: 600;
+    white-space: nowrap;
+}

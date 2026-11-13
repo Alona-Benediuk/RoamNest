@@ -1,0 +1,99 @@
+/* =========================================================
+   Панель фільтрів (за макетом Figma: ширина 573px)
+   ========================================================= */
+
+.rn-filters {
+    --f-green: #26382E;
+    --f-orange: #FF9800;
+    --f-yellow: #FCC05F;
+
+    padding: clamp(16px, 1.4vw, 26px) 0 clamp(16px, 1.4vw, 26px);
+    border-radius: 23px;
+    background-color: #FFE4B9;
+    box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
+    color: var(--f-green);
+}
+
+.rn-filters__title {
+    margin: 0 clamp(16px, 1.4vw, 26px) 6px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--f-green);
+    color: #C9781E;
+    font-size: clamp(20px, 1.5vw, 30px);
+    font-weight: 600;
+}
+
+.rn-filters__group {
+    margin: 0;
+    padding: clamp(14px, 1.2vw, 22px) 0 0;
+    border: none;
+}
+
+.rn-filters__group-title {
+    float: left;                      /* щоб legend поводився як звичайний заголовок */
+    width: 100%;
+    margin-bottom: 8px;
+    padding: 0 clamp(20px, 2vw, 40px);
+    font-size: clamp(14px, 1vw, 19px);
+    font-weight: 600;
+}
+
+.rn-filters__option {
+    clear: both;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 3px clamp(20px, 2vw, 40px);
+    font-size: clamp(12px, 0.8vw, 15px);
+    cursor: pointer;
+}
+.rn-filters__option:hover { background-color: rgba(255, 255, 255, 0.4); }
+
+/* Справжній чекбокс прихований, але доступний з клавіатури */
+.rn-filters__option input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Помаранчевий овальний «чекбокс», як у макеті */
+.rn-filters__check {
+    flex: 0 0 auto;
+    width: 12px;
+    height: 16px;
+    border-radius: 50%;
+    border: 1.5px solid var(--f-orange);
+    transition: background-color 0.15s ease;
+}
+.rn-filters__option input:checked + .rn-filters__check {
+    background-color: var(--f-orange);
+    box-shadow: inset 0 0 0 2px #FFE4B9;
+}
+.rn-filters__option input:focus-visible + .rn-filters__check {
+    outline: 2px solid var(--f-green);
+    outline-offset: 2px;
+}
+
+/* Жовта смуга «Більше ⌄» на всю ширину */
+.rn-filters__more {
+    clear: both;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+    width: 100%;
+    margin-top: 8px;
+    padding: 3px 0;
+    border: none;
+    background-color: var(--f-yellow);
+    color: #FFFFFF;
+    font-family: inherit;
+    font-size: clamp(11px, 0.7vw, 13px);
+    font-weight: 500;
+    cursor: pointer;
+    transition: filter 0.15s ease;
+}
+.rn-filters__more:hover { filter: brightness(0.95); }
+
+.rn-filters__chevron { transition: transform 0.2s ease; line-height: 0.6; }
+.rn-filters__chevron.is-open { transform: rotate(180deg); }

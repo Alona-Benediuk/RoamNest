@@ -1,0 +1,208 @@
+/* =========================================================
+   Сторінка «Варіанти проживання» (за макетом Figma)
+   Макет 1920px: список 1167px, бокова колонка 573px.
+   ========================================================= */
+
+.rn-search {
+    --s-green: #26382E;
+    --s-cream: #FFF6EC;
+    --s-peach: #FFE4B9;
+    --s-orange: #FF9800;
+    --s-yellow: #FCC05F;
+
+    position: relative;
+    overflow: hidden;
+    /* відступ зверху: шапка сайту лежить поверх сторінки (position: absolute) */
+    padding: clamp(100px, 7.5vw, 140px) clamp(16px, 4vw, 80px) clamp(56px, 5vw, 96px);
+    background: linear-gradient(180deg, var(--s-peach) 0%, #FFEFD6 100%);
+    color: var(--s-green);
+}
+
+/* М'які помаранчеві «плями» на фоні, як у макеті */
+.rn-search::before,
+.rn-search::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(110px);
+    pointer-events: none;
+}
+.rn-search::before { width: 520px; height: 520px; top: 30%; left: -260px; background: rgba(255, 152, 0, 0.35); }
+.rn-search::after  { width: 520px; height: 520px; bottom: 5%; right: -260px; background: rgba(252, 192, 95, 0.5); }
+
+.rn-search__inner {
+    position: relative;
+    z-index: 1;
+    max-width: 1760px;
+    margin: 0 auto;
+}
+
+/* ---------- Панель пошуку ---------- */
+.rn-search-bar {
+    display: grid;
+    grid-template-columns: 2.4fr 1fr 1fr 1fr;
+    gap: clamp(8px, 0.8vw, 14px);
+    max-width: 1300px;
+}
+
+.rn-search-bar__input,
+.rn-search-bar__field {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: clamp(52px, 3.6vw, 68px);
+    padding: 0 clamp(12px, 1vw, 20px);
+    border-radius: 12px;
+    border: 1.5px solid rgba(38, 56, 46, 0.15);
+    background-color: #FFE5B6;
+    box-shadow: 0 4px 4px rgba(0, 0, 0, 0.1);
+    color: var(--s-green);
+    font-family: inherit;
+    text-align: left;
+}
+
+.rn-search-bar__input input {
+    flex: 1;
+    min-width: 0;
+    border: none;
+    background: transparent;
+    outline: none;
+    font-family: inherit;
+    font-size: clamp(14px, 1vw, 18px);
+    font-weight: 500;
+    color: var(--s-green);
+}
+.rn-search-bar__input input::placeholder { color: var(--s-green); opacity: 0.8; }
+.rn-search-bar__input:focus-within { border-color: var(--s-orange); }
+
+.rn-search-bar__field { cursor: pointer; transition: border-color 0.2s ease; }
+.rn-search-bar__field:hover { border-color: var(--s-orange); }
+.rn-search-bar__icon { font-size: 18px; }
+.rn-search-bar__label { display: block; font-size: clamp(14px, 1vw, 18px); font-weight: 600; }
+.rn-search-bar__value { display: block; font-size: 11px; opacity: 0.7; }
+
+/* ---------- «Назад» і кількість ---------- */
+.rn-search__toolbar {
+    display: flex;
+    align-items: center;
+    gap: clamp(12px, 1.5vw, 28px);
+    margin: clamp(16px, 1.4vw, 26px) 0 clamp(24px, 2.4vw, 46px);
+}
+
+/* Кнопка-«язичок», що виходить від лівого краю сторінки */
+.rn-search__back {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: calc(-1 * clamp(16px, 4vw, 80px));
+    padding: clamp(8px, 0.7vw, 14px) clamp(24px, 2vw, 40px) clamp(8px, 0.7vw, 14px) clamp(40px, 4vw, 90px);
+    border: none;
+    border-radius: 0 50px 50px 0;
+    background-color: var(--s-cream);
+    color: var(--s-green);
+    font-family: inherit;
+    font-size: clamp(16px, 1.2vw, 24px);
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+.rn-search__back:hover { background-color: #FFFFFF; }
+
+.rn-search__count {
+    padding: clamp(8px, 0.7vw, 14px) clamp(20px, 2vw, 40px);
+    border-radius: 50px;
+    background-color: rgba(38, 56, 46, 0.1);
+    font-size: clamp(13px, 0.9vw, 16px);
+    font-weight: 500;
+}
+
+/* ---------- Дві колонки ---------- */
+.rn-search__layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1167fr) minmax(280px, 573fr);
+    gap: clamp(16px, 1.2vw, 24px);
+    align-items: start;
+}
+
+.rn-search__results {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(14px, 1vw, 20px);
+}
+
+.rn-search__sidebar {
+    position: sticky;
+    top: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(14px, 1vw, 20px);
+}
+
+.rn-search__empty {
+    padding: 48px 24px;
+    border-radius: 30px;
+    background-color: var(--s-cream);
+    text-align: center;
+}
+.rn-search__empty button {
+    margin-top: 12px;
+    padding: 10px 24px;
+    border: none;
+    border-radius: 50px;
+    background-color: var(--s-orange);
+    color: #FFFFFF;
+    font-family: inherit;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* ---------- Пагінація: помаранчеві рисочки ---------- */
+.rn-pagination {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: clamp(24px, 3vw, 56px);
+}
+.rn-pagination button {
+    width: clamp(28px, 2vw, 40px);
+    height: 8px;
+    padding: 0;
+    border: none;
+    border-radius: 2px;
+    background-color: var(--s-orange);
+    opacity: 0.45;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+}
+.rn-pagination button:hover,
+.rn-pagination button.is-active { opacity: 1; }
+
+/* ---------- Карта: у макеті 573 × 559, радіус 32, біла рамка 8px ---------- */
+.rn-map {
+    aspect-ratio: 573 / 559;
+    border-radius: 32px;
+    border: clamp(4px, 0.42vw, 8px) solid #FFFFFF;
+    overflow: hidden;
+    box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
+    background-color: #F4EFE6;
+}
+.rn-map__img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    object-fit: cover;
+}
+
+/* ---------- Адаптивність ---------- */
+@media (max-width: 1100px) {
+    .rn-search__layout { grid-template-columns: 1fr; }
+    /* на планшеті спершу список, а карта й фільтри — під ним, у дві колонки */
+    .rn-search__sidebar { position: static; display: grid; grid-template-columns: 1fr 1fr; align-items: start; }
+}
+
+@media (max-width: 768px) {
+    .rn-search-bar { grid-template-columns: 1fr 1fr; }
+    .rn-search-bar__input { grid-column: 1 / -1; }
+    .rn-search__sidebar { grid-template-columns: 1fr; }
+}
