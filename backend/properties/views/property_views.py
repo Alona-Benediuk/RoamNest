@@ -27,17 +27,32 @@ from rest_framework.views import APIView
 from ..models import Amenity, Category, Property, RentalUnit
 from ..serializers import PropertyListSerializer
 
+
 class PropertyCreateSerializer(serializers.ModelSerializer):
     amenities = serializers.PrimaryKeyRelatedField(
-            many=True,
-            queryset=Amenity.objects.all(),
-            required=False,
-        )
+        many=True,
+        queryset=Amenity.objects.all(),
+        required=False,
+    )
 
     categories = serializers.PrimaryKeyRelatedField(
         many=True,
         queryset=Category.objects.filter(is_active=True),
         required=False,
+    )
+
+    latitude = serializers.DecimalField(
+        max_digits=9,
+        decimal_places=6,
+        required=False,
+        allow_null=True,
+    )
+
+    longitude = serializers.DecimalField(
+        max_digits=9,
+        decimal_places=6,
+        required=False,
+        allow_null=True,
     )
 
     class Meta:
@@ -49,9 +64,120 @@ class PropertyCreateSerializer(serializers.ModelSerializer):
             "address",
             "city",
             "country",
+            "latitude",
+            "longitude",
             "amenities",
             "categories",
         ]
+
+    def validate(self, attrs):
+        latitude = attrs.get("latitude")
+        longitude = attrs.get("longitude")
+
+        if (latitude is None) != (longitude is None):
+            raise serializers.ValidationError({
+                "coordinates": "Latitude and longitude must be provided together."
+            })
+
+        return attrs
+
+    def create(self, validated_data):
+        amenities = validated_data.pop("amenities", [])
+        categories = validated_data.pop("categories", [])
+
+        latitude = validated_data.pop("latitude", None)
+        longitude = validated_data.pop("longitude", None)
+
+        if latitude is None or longitude is None:
+            from ..geocoding import get_coordinates
+
+            from ..geocoding import (
+                AddressNotFoundError,
+                GeocodingServiceError,
+            )
+
+            try:
+                latitude, longitude = get_coordinates(
+                    address=validated_data["address"],
+                    city=validated_data["city"],
+                    country=validated_data["country"],
+                )
+            except AddressNotFoundError as exc:
+                raise serializers.ValidationError({
+                    "address": str(exc)
+                })
+            except GeocodingServiceError as exc:
+                raise serializers.ValidationError({
+                    "geocoding": str(exc)
+                })
+
+        property_obj = Property.objects.create(
+            **validated_data,
+            latitude=latitude,
+            longitude=longitude,
+        )
+
+        property_obj.amenities.set(amenities)
+        property_obj.categories.set(categories)
+
+        return property_obj
+
+    def update(self, instance, validated_data):
+        amenities = validated_data.pop("amenities", None)
+        categories = validated_data.pop("categories", None)
+
+        latitude = validated_data.pop("latitude", None)
+        longitude = validated_data.pop("longitude", None)
+
+        address_changed = any(
+            field in validated_data
+            and validated_data[field] != getattr(instance, field)
+            for field in ("address", "city", "country")
+        )
+
+        if latitude is not None or longitude is not None:
+            if latitude is None or longitude is None:
+                raise serializers.ValidationError({
+                    "coordinates": "Latitude and longitude must be provided together."
+                })
+
+            instance.latitude = latitude
+            instance.longitude = longitude
+
+        elif address_changed:
+            from ..geocoding import (
+                get_coordinates,
+                AddressNotFoundError,
+                GeocodingServiceError,
+            )
+
+            try:
+                instance.latitude, instance.longitude = get_coordinates(
+                    address=validated_data.get("address", instance.address),
+                    city=validated_data.get("city", instance.city),
+                    country=validated_data.get("country", instance.country),
+                )
+            except AddressNotFoundError as exc:
+                raise serializers.ValidationError({
+                    "address": str(exc)
+                })
+            except GeocodingServiceError as exc:
+                raise serializers.ValidationError({
+                    "geocoding": str(exc)
+                })
+
+        for field, value in validated_data.items():
+            setattr(instance, field, value)
+
+        instance.save()
+
+        if amenities is not None:
+            instance.amenities.set(amenities)
+
+        if categories is not None:
+            instance.categories.set(categories)
+
+        return instance
 
 
 def _check_owner(request):

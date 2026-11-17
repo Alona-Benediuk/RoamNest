@@ -131,6 +131,8 @@ class PropertyListSerializer(serializers.ModelSerializer):
             "address",
             "city",
             "country",
+            "latitude",
+            "longitude",
             "status",
             "amenities",
             "categories",
