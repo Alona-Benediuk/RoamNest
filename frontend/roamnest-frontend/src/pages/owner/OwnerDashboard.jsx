@@ -124,7 +124,14 @@ const OwnerDashboard = () => {
                             Календар
                         </Link>
                         
-                        <button className="btn-outline">Аналітика та фінанси</button>
+                        {/* ССЫЛКА НА АНАЛИТИКУ */}
+                        <Link 
+                            to="/owner/analytics" 
+                            className="btn-outline" 
+                            style={{ textDecoration: 'none', textAlign: 'center', display: 'block' }}
+                        >
+                            Аналітика та фінанси
+                        </Link>
                         
                         {/* ССЫЛКА НА СОЗДАНИЕ */}
                         <Link 

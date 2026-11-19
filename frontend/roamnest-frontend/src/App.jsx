@@ -17,6 +17,7 @@ import OwnerDashboard from './pages/owner/OwnerDashboard';
 import OwnerBookings from './pages/owner/OwnerBookings'; 
 import OwnerPropertyDetails from './pages/owner/OwnerPropertyDetails';
 import OwnerCalendar from './pages/owner/OwnerCalendar';
+import OwnerAnalytics from './pages/owner/OwnerAnalytics'; // <-- ДОБАВЛЕН ИМПОРТ
 
 // Импорты для админа
 import AdminUsers from './pages/admin/AdminUsers';
@@ -50,7 +51,8 @@ function App() {
                         <Route element={<Layout />}>
                             <Route path="/owner/dashboard" element={<OwnerDashboard />} />
                             <Route path="/owner/bookings" element={<OwnerBookings />} /> 
-                            <Route path="/owner/calendar" element={<OwnerCalendar />} /> {/* <-- ДОБАВЛЕН МАРШРУТ */}
+                            <Route path="/owner/calendar" element={<OwnerCalendar />} />
+                            <Route path="/owner/analytics" element={<OwnerAnalytics />} /> {/* <-- ДОБАВЛЕН МАРШРУТ */}
                             
                             {/* ВАЖНО: маршрут "new" должен идти ПЕРЕД маршрутом ":id" */}
                             <Route path="/owner/properties/new" element={<OwnerPropertyDetails />} />

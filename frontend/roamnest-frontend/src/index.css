@@ -3401,4 +3401,298 @@ button { cursor: pointer; border: none; font-family: inherit; }
     border: 4px solid #8BC34A;
 }
 
+/* =========================================
+   OWNER ANALYTICS PAGE (АНАЛИТИКА)
+   ========================================= */
+.analytics-page {
+    background-color: #F8F5EE;
+    min-height: 100vh;
+    padding: 100px 0 60px 0;
+}
+
+.analytics-main-title {
+    font-size: 36px;
+    font-weight: 800;
+    color: #2d312a;
+    margin: 20px 0 30px 0;
+}
+
+.analytics-grid {
+    display: grid;
+    grid-template-columns: 2.5fr 1fr;
+    gap: 25px;
+    align-items: start;
+}
+
+.analytics-card {
+    background-color: #fff;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+}
+
+.analytics-card-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #2d312a;
+    margin-bottom: 20px;
+}
+
+/* График выплат */
+.payout-timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.timeline-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #F8F5EE;
+    border-radius: 12px;
+    overflow: hidden;
+    padding: 5px;
+}
+
+.timeline-info {
+    display: flex;
+    flex-direction: column;
+    padding-left: 10px;
+}
+
+.timeline-date {
+    font-size: 13px;
+    font-weight: 700;
+    color: #333;
+}
+
+.timeline-prop {
+    font-size: 11px;
+    color: #777;
+}
+
+.timeline-bar {
+    background-color: #8BC34A;
+    color: #fff;
+    font-weight: 700;
+    font-size: 14px;
+    padding: 10px 20px;
+    border-radius: 8px;
+    min-width: 100px;
+    text-align: center;
+}
+
+/* Объекты */
+.analytics-properties-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.analytics-prop-card {
+    background: #F8F5EE;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.analytics-prop-card img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+}
+
+.analytics-prop-info {
+    padding: 15px;
+}
+
+.analytics-prop-info h4 {
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+
+.analytics-prop-info p {
+    font-size: 12px;
+    color: #777;
+    margin-bottom: 15px;
+}
+
+.prop-price-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.price-input-group {
+    display: flex;
+    align-items: center;
+    background: #fff;
+    border: 1px solid #E5DEC9;
+    border-radius: 8px;
+    padding: 5px 10px;
+    flex: 1;
+}
+
+.price-input-group span {
+    color: #F5A623;
+    font-weight: 700;
+    margin-right: 5px;
+}
+
+.price-input-group input {
+    border: none;
+    outline: none;
+    width: 100%;
+    font-weight: 700;
+    font-size: 14px;
+    color: #333;
+    background: transparent;
+}
+
+.price-edit-icon {
+    background: #fff;
+    border: 1px solid #E5DEC9;
+    border-radius: 8px;
+    padding: 5px 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+.prop-actions-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.prop-old-price {
+    font-size: 12px;
+    color: #999;
+    text-decoration: line-through;
+}
+
+.btn-calendar-prop {
+    background: transparent;
+    border: 1px solid #333;
+    border-radius: 50px;
+    padding: 6px 15px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #333;
+    text-decoration: none;
+}
+
+/* Доходы */
+.income-card {
+    background: #FDFBF7;
+    border: 1px solid #E5DEC9;
+}
+
+.income-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 15px;
+}
+
+.income-select {
+    background: #F5A623;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #000;
+    cursor: pointer;
+    outline: none;
+}
+
+.income-amount {
+    font-size: 42px;
+    font-weight: 800;
+    color: #F5A623;
+    line-height: 1;
+    margin-bottom: 5px;
+}
+
+.income-subtext {
+    font-size: 12px;
+    color: #888;
+}
+
+/* Комиссии */
+.fees-card {
+    background: #FDFBF7;
+    border: 1px solid #E5DEC9;
+    margin-top: 15px;
+}
+
+.fee-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    color: #555;
+    margin-bottom: 10px;
+}
+
+.fee-row:last-child {
+    margin-bottom: 0;
+}
+
+.fee-row strong {
+    color: #333;
+}
+
+/* История выплат */
+.payout-history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.history-item {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    align-items: center;
+    background: #F8F5EE;
+    padding: 10px 15px;
+    border-radius: 10px;
+    font-size: 12px;
+}
+
+.history-date {
+    color: #777;
+}
+
+.history-amount {
+    font-weight: 700;
+    color: #8BC34A;
+}
+
+.history-status {
+    font-weight: 600;
+    color: #333;
+    text-align: right;
+}
+
+/* Адаптив */
+@media (max-width: 1024px) {
+    .analytics-grid {
+        grid-template-columns: 1fr;
+    }
+    .analytics-properties-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .analytics-properties-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
 
