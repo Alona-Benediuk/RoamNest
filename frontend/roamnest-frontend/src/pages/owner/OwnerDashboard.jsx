@@ -115,7 +115,15 @@ const OwnerDashboard = () => {
 
                     {/* Блок с кнопками */}
                     <div className="profile-actions">
-                        <button className="btn-outline">Календар</button>
+                        {/* ССЫЛКА НА КАЛЕНДАРЬ */}
+                        <Link 
+                            to="/owner/calendar" 
+                            className="btn-outline" 
+                            style={{ textDecoration: 'none', textAlign: 'center', display: 'block' }}
+                        >
+                            Календар
+                        </Link>
+                        
                         <button className="btn-outline">Аналітика та фінанси</button>
                         
                         {/* ССЫЛКА НА СОЗДАНИЕ */}
