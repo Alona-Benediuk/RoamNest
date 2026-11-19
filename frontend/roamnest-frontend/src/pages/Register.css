@@ -1,0 +1,378 @@
+/* =========================================================
+   Реєстрація (макет Figma, Wireframe 7)
+   ========================================================= */
+
+.rn-auth {
+    --a-cream: #FFE4B9;
+    --a-yellow: #FCC05F;
+    --a-green: #26382E;
+
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: clamp(600px, 50vw, 960px);   /* як у макеті: футер одразу під фото */
+    padding: clamp(120px, 12vw, 200px) clamp(16px, 4vw, 80px) clamp(110px, 9vw, 160px);
+    background: var(--a-green) url('../assets/auth-bg.jpg') center 65% / cover no-repeat;
+    overflow: hidden;
+}
+
+.rn-auth::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.3);
+}
+
+/* шапка напівпрозора поверх фото */
+.app-layout:has(.rn-auth) .top-nav {
+    background-color: rgba(38, 56, 46, 0.34);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+}
+
+/* ---------- Скляна панель: 1266 × 391, радіус 25 ---------- */
+.rn-auth__panel {
+    position: relative;
+    z-index: 1;
+    width: min(1266px, 100%);
+    min-height: clamp(260px, 20.4vw, 391px);
+    padding: clamp(28px, 2.6vw, 50px) clamp(20px, 4vw, 80px);
+    border-radius: 25px;
+    background: rgba(217, 217, 217, 0.08);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: var(--a-cream);
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);   /* текст читається на світлому фото */
+}
+
+/* великий логотип над правим краєм панелі */
+.rn-auth__logo {
+    position: absolute;
+    top: clamp(-150px, -7.8vw, -70px);
+    right: clamp(8px, 4vw, 80px);
+    width: clamp(110px, 14.5vw, 280px);
+    pointer-events: none;
+}
+.rn-auth__logo svg { width: 100%; height: auto; }
+
+/* ---------- Крок 1: вибір статусу ---------- */
+.rn-auth__choose {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.rn-auth__title {
+    font-size: clamp(26px, 2.5vw, 48px);
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+.rn-auth__subtitle {
+    margin-top: 6px;
+    font-size: clamp(15px, 1.25vw, 24px);
+    opacity: 0.9;
+}
+
+/* кнопки «сходинкою»: Власник ліворуч, Гість нижче праворуч */
+.rn-auth__roles {
+    display: grid;
+    grid-template-columns: auto auto;
+    grid-template-rows: auto auto;
+    align-items: center;
+    column-gap: clamp(12px, 1.2vw, 24px);
+    margin-top: clamp(20px, 2vw, 36px);
+}
+
+.rn-auth__role {
+    --h: clamp(44px, 3.6vw, 70px);
+    --r: calc(var(--h) / 2);
+    height: var(--h);
+    min-width: clamp(150px, 14vw, 270px);
+    padding: 0 clamp(24px, 2.2vw, 44px);
+    border: none;
+    background-color: var(--a-yellow);
+    color: var(--a-green);
+    font-family: inherit;
+    font-size: clamp(18px, 1.5vw, 28px);
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
+    transition: transform 0.2s ease, filter 0.2s ease;
+}
+.rn-auth__role:hover { transform: translateY(-2px); filter: brightness(1.05); }
+
+.rn-auth__role--owner {
+    grid-column: 1;
+    grid-row: 1;
+    border-radius: var(--r) calc(var(--r) * 0.8) 0 var(--r);
+}
+
+.rn-auth__or {
+    grid-column: 2;
+    grid-row: 1;
+    justify-self: start;
+    font-size: clamp(24px, 2.3vw, 44px);
+    font-weight: 500;
+}
+
+.rn-auth__role--guest {
+    grid-column: 2;
+    grid-row: 2;
+    margin-top: clamp(6px, 0.6vw, 12px);
+    border-radius: 0 var(--r) var(--r) calc(var(--r) * 0.8);
+}
+
+/* ---------- Кроки «Вхід», «Реєстрація», «Успіх»: темна колонка по центру ---------- */
+.rn-auth--login,
+.rn-auth--register,
+.rn-auth--success {
+    align-items: stretch;
+    padding: 0;
+}
+
+.rn-auth__column {
+    position: relative;
+    z-index: 1;
+    width: clamp(340px, 63vw, 1210px);
+    margin-top: 66px;   /* висота шапки */
+    padding: clamp(32px, 3.5vw, 64px) clamp(16px, 3vw, 56px) clamp(40px, 4vw, 72px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: rgba(20, 22, 18, 0.38);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    color: var(--a-cream);
+}
+
+.rn-auth__heading {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    margin-bottom: clamp(20px, 2vw, 40px);
+    font-size: clamp(22px, 2.1vw, 42px);
+    font-weight: 600;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+}
+
+/* жовта «пігулка» з роллю */
+.rn-auth__pill {
+    --r: clamp(20px, 1.6vw, 30px);
+    padding: clamp(6px, 0.5vw, 10px) clamp(18px, 1.6vw, 32px);
+    border-radius: var(--r) var(--r) var(--r) 0;
+    background-color: #FFC151;
+    color: var(--a-green);
+    font-size: 0.8em;
+    text-shadow: none;
+}
+
+.rn-auth__form {
+    width: min(100%, clamp(300px, 45vw, 870px));
+    display: flex;
+    flex-direction: column;
+    gap: clamp(10px, 0.8vw, 16px);
+}
+
+.rn-auth__gap { height: clamp(6px, 0.8vw, 16px); }
+
+/* ---------- Поля ---------- */
+.rn-field {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: clamp(50px, 4.2vw, 84px);
+    padding: 6px clamp(18px, 1.4vw, 28px);
+    border-radius: 999px;
+    background-color: #FFE4B9;
+    color: var(--a-green);
+    cursor: text;
+}
+.rn-field:focus-within { box-shadow: 0 0 0 3px rgba(255, 193, 81, 0.7); }
+
+.rn-field__label {
+    font-size: clamp(12px, 0.85vw, 16px);
+    font-weight: 600;
+}
+
+.rn-field input {
+    width: 100%;
+    border: none;
+    background: transparent;
+    outline: none;
+    font-family: inherit;
+    font-size: clamp(13px, 0.9vw, 17px);
+    color: var(--a-green);
+}
+.rn-field input::placeholder { color: rgba(38, 56, 46, 0.6); }
+
+.rn-field--password { padding-right: 56px; }
+
+.rn-field__eye {
+    position: absolute;
+    top: 50%;
+    right: clamp(14px, 1.2vw, 24px);
+    transform: translateY(-50%);
+    display: grid;
+    place-items: center;
+    padding: 4px;
+    border: none;
+    background: none;
+    color: var(--a-green);
+    cursor: pointer;
+}
+
+/* ---------- Кнопки ---------- */
+.rn-auth__submit {
+    min-height: clamp(48px, 4vw, 80px);
+    border: none;
+    border-radius: 999px;
+    background-color: #FFC151;
+    color: var(--a-green);
+    font-family: inherit;
+    font-size: clamp(16px, 1.25vw, 24px);
+    font-weight: 500;
+    cursor: pointer;
+    transition: filter 0.2s ease, transform 0.2s ease;
+}
+.rn-auth__submit:hover { filter: brightness(1.05); transform: translateY(-1px); }
+.rn-auth__submit:disabled { opacity: 0.7; cursor: wait; }
+
+.rn-auth__submit--short { width: 66%; align-self: center; margin-top: 6px; }
+
+.rn-auth__or-small {
+    margin: clamp(12px, 1.2vw, 24px) 0;
+    font-size: clamp(18px, 1.5vw, 28px);
+    font-weight: 500;
+}
+
+/* Google: «хвостик» знизу праворуч, як у макеті */
+.rn-auth__google {
+    --r: clamp(26px, 2.2vw, 42px);
+    display: inline-flex;
+    align-items: center;
+    gap: clamp(14px, 1.6vw, 32px);
+    min-height: clamp(50px, 4.2vw, 84px);
+    padding: 0 clamp(20px, 2vw, 40px);
+    border: none;
+    border-radius: var(--r) var(--r) 0 var(--r);
+    background-color: #FFE4B9;
+    color: var(--a-green);
+    font-family: inherit;
+    font-size: clamp(14px, 1vw, 19px);
+    font-weight: 600;
+    cursor: not-allowed;
+}
+
+.rn-auth__switch {
+    margin-top: clamp(20px, 2vw, 40px);
+    font-size: clamp(14px, 1vw, 19px);
+    text-decoration: underline;
+}
+.rn-auth__switch button {
+    padding: 0;
+    border: none;
+    background: none;
+    color: #FF4D4D;
+    font: inherit;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.rn-auth__terms {
+    max-width: clamp(300px, 32vw, 620px);
+    margin-top: clamp(18px, 1.6vw, 32px);
+    font-size: clamp(11px, 0.75vw, 14px);
+    line-height: 1.5;
+}
+.rn-auth__terms a {
+    color: #FFC151;
+    text-decoration: underline;
+    text-decoration-color: #FF4D4D;
+}
+
+.rn-auth__error {
+    padding: 8px 16px;
+    border-radius: 12px;
+    background-color: rgba(255, 77, 77, 0.2);
+    color: #FFD9D3;
+    font-size: 14px;
+    text-align: center;
+}
+
+/* ---------- Успіх ---------- */
+.rn-auth__column--success {
+    justify-content: center;
+    align-items: flex-start;
+    padding-left: clamp(24px, 4vw, 80px);
+    padding-right: clamp(24px, 4vw, 80px);
+}
+
+.rn-auth__success {
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    align-items: end;
+    gap: clamp(16px, 2vw, 40px);
+    color: #FFC151;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.rn-auth__success-title {
+    font-size: clamp(24px, 2.3vw, 44px);
+    font-weight: 700;
+    line-height: 1.35;
+}
+
+.rn-auth__success-text {
+    font-size: clamp(14px, 1.05vw, 20px);
+    font-weight: 600;
+    line-height: 1.45;
+}
+
+.rn-auth__submit--next {
+    width: clamp(200px, 22vw, 420px);
+    margin-top: clamp(24px, 2.5vw, 48px);
+}
+
+/* ---------- «Назад»: обвідка, від лівого краю ---------- */
+.rn-auth__back {
+    position: absolute;
+    left: 0;
+    bottom: clamp(24px, 3vw, 60px);
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: clamp(8px, 0.7vw, 14px) clamp(24px, 2vw, 40px) clamp(8px, 0.7vw, 14px) clamp(20px, 2.5vw, 48px);
+    border: 2px solid var(--a-cream);
+    border-left: none;
+    border-radius: 0 50px 50px 0;
+    background: transparent;
+    color: var(--a-cream);
+    font-family: inherit;
+    font-size: clamp(16px, 1.3vw, 26px);
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+.rn-auth__back:hover { background-color: rgba(255, 228, 185, 0.15); }
+
+/* ---------- Телефон ---------- */
+@media (max-width: 640px) {
+    .rn-auth__column { width: 100%; }
+    .rn-auth__success { grid-template-columns: 1fr; }
+    .rn-auth__submit--short { width: 100%; }
+    .rn-auth__logo { top: -64px; right: 50%; transform: translateX(50%); width: 96px; }
+    .rn-auth__panel { padding-top: 48px; }
+    .rn-auth__roles { grid-template-columns: 1fr; justify-items: center; row-gap: 8px; }
+    .rn-auth__role--owner,
+    .rn-auth__or,
+    .rn-auth__role--guest { grid-column: 1; grid-row: auto; justify-self: center; margin: 0; }
+    .rn-auth__back { bottom: 20px; }
+}
