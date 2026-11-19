@@ -16,11 +16,11 @@ export const getAmenities = async () => {
 };
 
 export const createProperty = async (data) => {
-    const response = await axiosClient.post('/properties/', data);
+    const response = await axiosClient.post('/api/properties/', data);
     return response.data;
 };
 
 export const updateProperty = async (id, data) => {
-    const response = await axiosClient.patch(`/properties/${id}/`, data);
+    const response = await axiosClient.patch(`/api/properties/${id}/`, data);
     return response.data;
 };

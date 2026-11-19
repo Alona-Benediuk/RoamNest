@@ -40,8 +40,8 @@ const PropertyDetails = () => {
             return;
         }
 
-        // Проверяем, есть ли комнаты у помешкання
-        const roomId = property.rooms && property.rooms.length > 0 ? property.rooms[0].id : null;
+        // Проверяем, есть ли комнаты (rental_units) у помешкання
+        const roomId = property.rental_units && property.rental_units.length > 0 ? property.rental_units[0].id : null;
         
         if (!roomId) {
             alert('На жаль, для цього помешкання ще не додано жодної кімнати для бронювання.');
@@ -72,7 +72,8 @@ const PropertyDetails = () => {
         ? images.map(img => img.image) 
         : [main_image, main_image, main_image]; 
 
-    const displayPrice = price_per_night || 3341; // Для красоты, если бэкенд не вернул цену
+    // +++ ИСПРАВЛЕНО: Берем цену из rental_units, так как она переехала туда
+    const displayPrice = property.rental_units?.[0]?.price_per_night || price_per_night || 3341;
 
     return (
         <div className="property-details-page">

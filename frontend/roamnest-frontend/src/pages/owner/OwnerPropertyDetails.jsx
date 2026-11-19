@@ -1,6 +1,8 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
-import { getPropertyById, createProperty, updateProperty } from '../../api/properties'; // <-- Импортируем новые функции
+import { useEffect, useState, useRef } from 'react';
+import { MapContainer, TileLayer, Marker } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+import { getPropertyById, createProperty, updateProperty } from '../../api/properties'; 
 import { useAuth } from '../../hooks/useAuth';
 
 const OwnerPropertyDetails = () => {
@@ -17,11 +19,18 @@ const OwnerPropertyDetails = () => {
         address: '2d Lakelet street',
         price_per_night: '3341',
         description: 'Тут ви можете вказати додаткові деталі про помешкання...',
-        main_image: 'https://images.unsplash.com/photo-1510798831971-661eb04b3739?q=80&w=1200&auto=format&fit=crop'
+        main_image: 'https://images.unsplash.com/photo-1510798831971-661eb04b3739?q=80&w=1200&auto=format&fit=crop',
+        property_type: 'APARTMENT' // <-- ДОБАВЛЕНО: Обязательное поле для Django
     });
     
     const [loading, setLoading] = useState(!isNew);
-    const [isSaving, setIsSaving] = useState(false); // Состояние для кнопки "Створити"
+    const [isSaving, setIsSaving] = useState(false); 
+
+    const [coordinates, setCoordinates] = useState({
+        latitude: 49.5883, 
+        longitude: 34.5514
+    });
+    const markerRef = useRef(null);
 
     useEffect(() => {
         if (isNew) {
@@ -33,6 +42,12 @@ const OwnerPropertyDetails = () => {
             try {
                 const data = await getPropertyById(id);
                 setProperty(data);
+                if (data.latitude && data.longitude) {
+                    setCoordinates({
+                        latitude: Number(data.latitude),
+                        longitude: Number(data.longitude)
+                    });
+                }
             } catch (err) {
                 console.error(err);
                 alert('Не вдалося завантажити інформацію.');
@@ -47,12 +62,22 @@ const OwnerPropertyDetails = () => {
         setProperty({ ...property, [e.target.name]: e.target.value });
     };
 
-    // РЕАЛЬНОЕ СОХРАНЕНИЕ НА БЭКЕНД
+    const eventHandlers = {
+        dragend() {
+            const marker = markerRef.current;
+            if (marker != null) {
+                const newPos = marker.getLatLng();
+                setCoordinates({
+                    latitude: newPos.lat,
+                    longitude: newPos.lng
+                });
+            }
+        },
+    };
+
     const handleSave = async () => {
         setIsSaving(true);
         
-        // Формируем данные, которые ждет бэкенд. 
-        // (Если каких-то полей не хватает, Django вернет 400 ошибку и укажет каких)
         const payload = {
             title: property.title,
             city: property.city,
@@ -61,24 +86,28 @@ const OwnerPropertyDetails = () => {
             price_per_night: parseFloat(property.price_per_night),
             description: property.description,
             main_image: property.main_image,
-            // owner: user.id // (Если бэкенд требует передавать ID владельца вручную)
+            latitude: coordinates.latitude,
+            longitude: coordinates.longitude,
+            
+            // +++ ДОБАВЛЕНО: Обязательные поля для успешного POST запроса
+            property_type: property.property_type || 'APARTMENT', 
+            amenities: property.amenities || [], 
+            categories: property.categories || [],
+            // owner: user.id // Если бэкенд требует передать ID владельца, раскомментируй эту строку
         };
 
         try {
             if (isNew) {
-                // Создаем новый объект (POST)
                 await createProperty(payload);
             } else {
-                // Обновляем существующий (PATCH)
                 await updateProperty(id, payload);
             }
             
-            // Если всё успешно — возвращаемся в кабинет
             navigate('/owner/dashboard');
         } catch (err) {
             console.error('Помилка збереження:', err.response?.data);
-            // Показываем ошибку от Django (например, "title: This field is required")
             if (err.response?.data) {
+                // Выводим точную ошибку от Django, чтобы понять, чего не хватает
                 const errors = Object.entries(err.response.data).map(([k, v]) => `${k}: ${v[0]}`).join(' | ');
                 alert(`Помилка: ${errors}`);
             } else {
@@ -95,7 +124,6 @@ const OwnerPropertyDetails = () => {
 
     return (
         <div className="property-details-page">
-            {/* ... Фоновая картинка и кнопка Назад (осталось без изменений) ... */}
             <div className="pd-hero" style={{ backgroundImage: `url(${main_image})` }}>
                 <div className="pd-hero-overlay"></div>
                 <div className="container pd-hero-container">
@@ -166,7 +194,31 @@ const OwnerPropertyDetails = () => {
                     </div>
                 </div>
 
-                {/* ... Остальной код (галерея, карточки, календарь) остался без изменений ... */}
+                <div style={{ marginBottom: '30px' }}>
+                    <h2 className="pd-section-title">Розташування на карті</h2>
+                    <p style={{ fontSize: '13px', color: '#888', marginBottom: '10px' }}>
+                        Перетягніть маркер, щоб вказати точне розташування
+                    </p>
+                    <div style={{ height: '400px', borderRadius: '16px', overflow: 'hidden', zIndex: 1 }}>
+                        <MapContainer
+                            center={[coordinates.latitude, coordinates.longitude]}
+                            zoom={13}
+                            style={{ height: '100%', width: '100%' }}
+                        >
+                            <TileLayer
+                                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                            />
+                            <Marker
+                                draggable={true}
+                                eventHandlers={eventHandlers}
+                                position={[coordinates.latitude, coordinates.longitude]}
+                                ref={markerRef}
+                            />
+                        </MapContainer>
+                    </div>
+                </div>
+
                 <div className="pd-layout">
                     <div className="pd-left-col">
                         <div className="pd-gallery">

@@ -17,7 +17,7 @@ const BookingForm = ({ roomId, maxGuests, pricePerNight, onSubmit }) => {
         e.preventDefault();
         if (!startDate || !endDate) return alert('Будь ласка, оберіть дати');
         onSubmit({
-            room: roomId,
+            rental_unit: roomId, // <-- ИЗМЕНЕНО: room на rental_unit
             check_in: startDate.toISOString().slice(0, 10),
             check_out: endDate.toISOString().slice(0, 10),
             guests,

@@ -4,7 +4,6 @@ import { getProperties } from '../api/properties';
 import PropertyListItem from '../components/property/PropertyListItem';
 import FiltersSidebar from '../components/property/FiltersSidebar';
 import SearchMap from '../components/search/SearchMap';
-import { DEMO_PROPERTIES } from '../data/demoProperties';
 import Icon from '../components/common/Icon';
 import './Search.css';
 
@@ -64,9 +63,10 @@ const Search = () => {
             try {
                 const data = await getProperties();
                 const items = Array.isArray(data) ? data : data.results || [];
-                setProperties(items.length ? items : DEMO_PROPERTIES);
-            } catch {
-                setProperties(DEMO_PROPERTIES);
+                setProperties(items);
+            } catch (err) {
+                console.error('Помилка завантаження:', err);
+                setProperties([]);
             } finally {
                 setLoading(false);
             }
@@ -140,7 +140,8 @@ const Search = () => {
                     </section>
 
                     <div className="rn-search__sidebar">
-                        <SearchMap />
+                        {/* Передаем данные в карту */}
+                        <SearchMap properties={filtered} />
                         <FiltersSidebar selected={filters} onChange={handleFiltersChange} />
                     </div>
                 </div>

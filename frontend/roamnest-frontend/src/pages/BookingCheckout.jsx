@@ -38,8 +38,8 @@ const BookingCheckout = () => {
     const endDate = new Date(checkOut);
     const nights = Math.max(1, Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24))) || 1;
     
-    // Цена (берем из базы или ставим дефолт как на скрине)
-    const pricePerNight = property.price_per_night || 341;
+    // Цена (берем из rental_units, так как price_per_night переехал туда)
+    const pricePerNight = property.rental_units?.[0]?.price_per_night || property.price_per_night || 341;
     const basePrice = pricePerNight * nights;
     const taxes = Math.round(basePrice * 0.1); // Имитация налога (10%)
     const totalPrice = basePrice + taxes;
@@ -50,7 +50,7 @@ const BookingCheckout = () => {
 
         try {
             await createBooking({
-                room: roomId,
+                rental_unit: roomId, // <-- ИЗМЕНЕНО: room на rental_unit
                 check_in: checkIn,
                 check_out: checkOut,
                 guests: parseInt(guests),
