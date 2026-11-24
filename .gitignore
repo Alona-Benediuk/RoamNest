@@ -23,3 +23,7 @@ media/
 # OS
 .DS_Store
 Thumbs.db
+
+# Keys & AWS credentials
+*.pem
+*_accessKeys.csv
