@@ -2,6 +2,7 @@
 from django.conf import settings
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
+from datetime import time
 
 
 class Category(models.Model):
@@ -92,6 +93,50 @@ class Property(models.Model):
 
     def __str__(self):
         return f"{self.title} - {self.city}"
+
+
+class PropertyPolicy(models.Model):
+    property = models.OneToOneField(
+        Property,
+        on_delete=models.CASCADE,
+        related_name="policy",
+    )
+
+    check_in_time = models.TimeField(default=time(12, 0))
+    check_out_time = models.TimeField(default=time(10, 0))
+
+    minimum_age = models.PositiveSmallIntegerField(default=18)
+
+    children_allowed = models.BooleanField(default=True)
+    children_min_age = models.PositiveSmallIntegerField(default=3)
+    children_max_age = models.PositiveSmallIntegerField(default=17)
+
+    pets_allowed = models.BooleanField(default=False)
+    smoking_allowed = models.BooleanField(default=False)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Policy - {self.property.title}"
+
+
+class CheckoutInstruction(models.Model):
+    policy = models.ForeignKey(
+        PropertyPolicy,
+        on_delete=models.CASCADE,
+        related_name="checkout_instructions",
+    )
+
+    title = models.CharField(max_length=200)
+    description = models.TextField(blank=True, default="")
+    sort_order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ["sort_order", "id"]
+
+    def __str__(self):
+        return self.title
 
 
 class PropertyCollection(models.Model):

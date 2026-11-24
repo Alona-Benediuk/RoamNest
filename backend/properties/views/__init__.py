@@ -1,4 +1,4 @@
-
+﻿
 from .property_views import (
     PropertyListAPIView,
     PropertyDetailAPIView,
@@ -20,3 +20,5 @@ from .rental_unit_views import (
     PropertyRentalUnitListCreateAPIView,
     RentalUnitDetailAPIView,
 )
+
+from .policy_views import PropertyPolicyAPIView
