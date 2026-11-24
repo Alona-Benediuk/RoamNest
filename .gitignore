@@ -27,3 +27,8 @@ Thumbs.db
 # Keys & AWS credentials
 *.pem
 *_accessKeys.csv
+
+# Aider, Node & editor backups
+.aider*
+node_modules/
+*.save
