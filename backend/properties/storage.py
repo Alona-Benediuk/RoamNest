@@ -10,11 +10,11 @@ class StorageError(Exception):
     """Raised when an object storage operation fails."""
 
 
-def _get_bucket_name():
-    bucket_name = settings.STORAGE_BUCKET_NAME
+def _get_bucket_name(bucket_name=None):
+    bucket_name = bucket_name or settings.STORAGE_BUCKET_NAME
 
     if not bucket_name:
-        raise StorageError("STORAGE_BUCKET_NAME is not configured.")
+        raise StorageError("Storage bucket is not configured.")
 
     return bucket_name
 
@@ -68,14 +68,14 @@ def _validate_object_key(object_key):
     return key
 
 
-def upload_file(file_obj, object_key, content_type=None):
+def upload_file(file_obj, object_key, content_type=None, bucket_name=None):
     """
     Upload a file to the configured S3-compatible storage.
 
     Returns the storage object key, not a public URL.
     """
     key = _validate_object_key(object_key)
-    bucket_name = _get_bucket_name()
+    bucket_name = _get_bucket_name(bucket_name)
     client = _get_s3_client()
 
     extra_args = {}
@@ -100,10 +100,10 @@ def upload_file(file_obj, object_key, content_type=None):
     return key
 
 
-def delete_file(object_key):
+def delete_file(object_key, bucket_name=None):
     """Delete an object from the configured storage."""
     key = _validate_object_key(object_key)
-    bucket_name = _get_bucket_name()
+    bucket_name = _get_bucket_name(bucket_name)
     client = _get_s3_client()
 
     try:
@@ -127,3 +127,25 @@ def get_public_url(object_key):
     encoded_key = quote(key, safe="/")
 
     return f"{base_url}/{encoded_key}"
+    
+
+def get_signed_url(object_key, bucket_name=None, expires_in=3600):
+    """Generate a temporary URL for a private storage object."""
+    key = _validate_object_key(object_key)
+    bucket_name = _get_bucket_name(bucket_name)
+    client = _get_s3_client()
+
+    try:
+        return client.generate_presigned_url(
+            "get_object",
+            Params={
+                "Bucket": bucket_name,
+                "Key": key,
+            },
+            ExpiresIn=expires_in,
+        )
+
+    except (BotoCoreError, ClientError) as error:
+        raise StorageError(
+            "Failed to generate signed storage URL."
+        ) from error

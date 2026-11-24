@@ -27,6 +27,10 @@ STORAGE_REGION = os.getenv("STORAGE_REGION")
 STORAGE_ACCESS_KEY_ID = os.getenv("STORAGE_ACCESS_KEY_ID")
 STORAGE_SECRET_ACCESS_KEY = os.getenv("STORAGE_SECRET_ACCESS_KEY")
 STORAGE_BUCKET_NAME = os.getenv("STORAGE_BUCKET_NAME")
+REVIEWS_STORAGE_BUCKET_NAME = os.getenv(
+    "REVIEWS_STORAGE_BUCKET_NAME",
+    "reviews",
+)
 STORAGE_PUBLIC_BASE_URL = os.getenv("STORAGE_PUBLIC_BASE_URL", "").rstrip("/")
 
 STORAGE_ADDRESSING_STYLE = os.getenv(
@@ -63,6 +67,7 @@ INSTALLED_APPS = [
     'accounts',
     'properties',
     'bookings',
+    'reviews',
     'corsheaders',
 ]
 
