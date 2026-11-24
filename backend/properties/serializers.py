@@ -1,8 +1,16 @@
 ﻿
 from rest_framework import serializers
 
-from .models import Property, RentalUnit, Amenity, PropertyImage, Category, PropertyCollection
-
+from .models import (
+    Property,
+    RentalUnit,
+    Amenity,
+    PropertyImage,
+    Category,
+    PropertyCollection,
+    PropertyPolicy,
+    CheckoutInstruction,
+)
 
 class AmenitySerializer(serializers.ModelSerializer):
     class Meta:
@@ -23,11 +31,99 @@ class CategorySerializer(serializers.ModelSerializer):
         ]
 
 
+
+class CheckoutInstructionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CheckoutInstruction
+        fields = [
+            "id",
+            "title",
+            "description",
+            "sort_order",
+        ]
+        read_only_fields = ["id"]
+
+
+class PropertyPolicySerializer(serializers.ModelSerializer):
+    checkout_instructions = CheckoutInstructionSerializer(
+        many=True,
+        required=False,
+    )
+
+    class Meta:
+        model = PropertyPolicy
+        fields = [
+            "check_in_time",
+            "check_out_time",
+            "minimum_age",
+            "children_allowed",
+            "children_min_age",
+            "children_max_age",
+            "pets_allowed",
+            "smoking_allowed",
+            "checkout_instructions",
+        ]
+
+    def validate(self, attrs):
+        min_age = attrs.get(
+            "children_min_age",
+            getattr(self.instance, "children_min_age", 3),
+        )
+        max_age = attrs.get(
+            "children_max_age",
+            getattr(self.instance, "children_max_age", 17),
+        )
+
+        if min_age > max_age:
+            raise serializers.ValidationError({
+                "children_max_age": (
+                    "Maximum children age cannot be less than minimum age."
+                )
+            })
+
+        return attrs
+
+    def create(self, validated_data):
+        instructions_data = validated_data.pop(
+            "checkout_instructions", []
+        )
+
+        policy = PropertyPolicy.objects.create(**validated_data)
+
+        for instruction in instructions_data:
+            CheckoutInstruction.objects.create(
+                policy=policy,
+                **instruction,
+            )
+
+        return policy
+
+    def update(self, instance, validated_data):
+        instructions_data = validated_data.pop(
+            "checkout_instructions", None
+        )
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+
+        instance.save()
+
+        if instructions_data is not None:
+            instance.checkout_instructions.all().delete()
+
+            for instruction in instructions_data:
+                CheckoutInstruction.objects.create(
+                    policy=instance,
+                    **instruction,
+                )
+
+        return instance
+
+
 class PropertyImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = PropertyImage
         fields = ["id", "image_url", "is_main", "rental_unit"]
-
 
 
 class PropertyImageWriteSerializer(serializers.ModelSerializer):
@@ -120,6 +216,7 @@ class PropertyListSerializer(serializers.ModelSerializer):
     amenities = AmenitySerializer(many=True, read_only=True)
     images = serializers.SerializerMethodField()
     categories = CategorySerializer(many=True, read_only=True)
+    policy = PropertyPolicySerializer(read_only=True)
 
     class Meta:
         model = Property
@@ -136,6 +233,7 @@ class PropertyListSerializer(serializers.ModelSerializer):
             "status",
             "amenities",
             "categories",
+            "policy",
             "rental_units",
             "images",
         ]

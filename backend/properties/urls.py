@@ -1,4 +1,4 @@
-
+﻿
 from django.urls import path
 
 from .views import (
@@ -8,6 +8,7 @@ from .views import (
     PropertyImageDeleteAPIView,
     PropertyRentalUnitListCreateAPIView,
     RentalUnitDetailAPIView,
+    PropertyPolicyAPIView,
 )
 
 urlpatterns = [
@@ -44,5 +45,12 @@ urlpatterns = [
         "rooms/<int:pk>/",
         RentalUnitDetailAPIView.as_view(),
         name="rental-unit-detail",
+    ),
+
+    # Правила проживання
+    path(
+        "<int:pk>/policy/",
+        PropertyPolicyAPIView.as_view(),
+        name="property-policy",
     ),
 ]
