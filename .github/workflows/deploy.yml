@@ -1,0 +1,42 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+      - feature/ecr-deployment
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push backend Docker image
+        run: |
+          docker build -t roamnest-backend ./backend
+          docker tag roamnest-backend:latest ${{ steps.login-ecr.outputs.registry }}/roamnest-backend:latest
+          docker push ${{ steps.login-ecr.outputs.registry }}/roamnest-backend:latest
+
+      - name: Build and push frontend Docker image
+        run: |
+          docker build -t roamnest-frontend ./frontend/roamnest-frontend
+          docker tag roamnest-frontend:latest ${{ steps.login-ecr.outputs.registry }}/roamnest-frontend:latest
+          docker push ${{ steps.login-ecr.outputs.registry }}/roamnest-frontend:latest
+
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd ~/RoamNest
+            docker compose pull
+            docker compose up -d
