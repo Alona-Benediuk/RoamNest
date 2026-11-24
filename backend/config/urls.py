@@ -1,4 +1,4 @@
-"""
+﻿"""
 URL configuration for config project.
 
 The `urlpatterns` list routes URLs to views. For more information please see:
@@ -48,6 +48,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/properties/", include("properties.urls")),
     path("api/bookings/", include("bookings.urls")),
+    path("api/reviews/", include("reviews.urls")),
     path("api/amenities/", AmenityListAPIView.as_view(), name="amenity-list"),
     path("api/categories/", CategoryListAPIView.as_view(), name="category-list"),
     path("api/collections/", PropertyCollectionListAPIView.as_view(), name="collection-list"),
