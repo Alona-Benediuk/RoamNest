@@ -42,15 +42,15 @@ class PropertyCreateSerializer(serializers.ModelSerializer):
     )
 
     latitude = serializers.DecimalField(
-        max_digits=9,
-        decimal_places=6,
+        max_digits=18,
+        decimal_places=14,
         required=False,
         allow_null=True,
     )
 
     longitude = serializers.DecimalField(
-        max_digits=9,
-        decimal_places=6,
+        max_digits=18,
+        decimal_places=14,
         required=False,
         allow_null=True,
     )
