@@ -64,8 +64,8 @@ class Property(models.Model):
     city = models.CharField(max_length=100)
     country = models.CharField(max_length=100, default="Ukraine")
     latitude = models.DecimalField(
-        max_digits=9,
-        decimal_places=6,
+        max_digits=18,
+        decimal_places=14,
         null=True,
         blank=True,
         validators=[
@@ -74,8 +74,8 @@ class Property(models.Model):
         ],
     )
     longitude = models.DecimalField(
-        max_digits=9,
-        decimal_places=6,
+        max_digits=18,
+        decimal_places=14,
         null=True,
         blank=True,
         validators=[
